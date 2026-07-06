@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap Video Editor Studio Maker Creator</title>
+    <style>
+        :root {
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --surface2: #334155;
+            --glass: rgba(30, 41, 59, 0.75);
+            --glass2: rgba(51, 65, 85, 0.65);
+            --border: rgba(255, 255, 255, 0.08);
+            --border2: rgba(255, 255, 255, 0.12);
+            --text: #FFFFFF;
+            --text2: #CBD5E1;
+            --accent: #3B82F6;
+            --accent2: #60A5FA;
+            --accent3: #93C5FD;
+            --danger: #EF4444;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 5px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --glow: 0 0 20px rgba(59, 130, 246, 0.3);
+            --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background: radial-gradient(ellipse at 30% 20%, #1E293B 0%, #0F172A 60%, #020617 100%);
+        }
+        /* Top Toolbar */
+        #topbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            min-height: 52px;
+        }
+        #topbar .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+        .tb-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border2);
+            background: var(--glass2);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: var(--font);
+        }
+        .tb-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: var(--glow);
+        }
+        .tb-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+            border-color: var(--accent);
+        }
+        .tb-btn.accent {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .tb-btn.accent:hover {
+            background: #2563EB;
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+        }
+        .tb-btn.icon-only {
+            padding: 8px 10px;
+            font-size: 1.1rem;
+        }
+        .tb-sep {
+            width: 1px;
+            height: 28px;
+            background: var(--border2);
+            border-radius: 1px;
+            margin: 0 4px;
+        }
+        /* Main layout */
+        #main-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        /* Left panel */
+        #left-panel {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 8px;
+            gap: 4px;
+            z-index: 50;
+            transition: transform 0.3s;
+        }
+        #left-panel.collapsed {
+            transform: translateX(-100%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 220px;
+        }
+        .panel-section {
+            margin-bottom: 6px;
+        }
+        .panel-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text2);
+            padding: 8px 10px 4px;
+            font-weight: 600;
+        }
+        .panel-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--radius-xs);
+            border: none;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.84rem;
+            transition: var(--transition);
+            text-align: left;
+            font-family: var(--font);
+        }
+        .panel-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .panel-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+            border-radius: var(--radius-xs);
+        }
+        .panel-btn.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: var(--accent2);
+            font-weight: 600;
+        }
+        .panel-btn .ico {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        /* Preview area */
+        #preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #020617;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+        }
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #main-canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+        #drop-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.3);
+            border: 3px dashed var(--accent2);
+            border-radius: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 20;
+            text-align: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #drop-overlay.visible {
+            opacity: 1;
+        }
+        #drop-overlay .drop-icon {
+            font-size: 4rem;
+        }
+        /* Right panel */
+        #right-panel {
+            width: 260px;
+            flex-shrink: 0;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 10px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.3s;
+        }
+        #right-panel.collapsed {
+            transform: translateX(100%);
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+        }
+        .prop-group {
+            background: var(--glass2);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            border: 1px solid var(--border);
+        }
+        .prop-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-bottom: 4px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .prop-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+            margin: 4px 0 8px;
+        }
+        .prop-group input[type="color"] {
+            width: 100%;
+            height: 32px;
+            border: 1px solid var(--border2);
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            background: transparent;
+            padding: 2px;
+        }
+        .prop-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border2);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.82rem;
+        }
+        .prop-group select:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        .prop-group input:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        .prop-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .prop-row input {
+            flex: 1;
+        }
+        .prop-row span {
+            font-size: 0.75rem;
+            color: var(--text2);
+            min-width: 35px;
+            text-align: right;
+        }
+        /* Bottom controls */
+        #bottom-bar {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+        #transport-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border2);
+            background: var(--glass2);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .ctrl-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+        }
+        .ctrl-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        .ctrl-btn.play-btn {
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .ctrl-btn.play-btn:hover {
+            background: #2563EB;
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+        }
+        #seek-bar-container {
+            flex: 1;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #seek-bar {
+            flex: 1;
+            accent-color: var(--accent);
+            height: 6px;
+            cursor: pointer;
+        }
+        #seek-bar:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        #time-display {
+            font-size: 0.8rem;
+            color: var(--text2);
+            white-space: nowrap;
+            min-width: 90px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        #volume-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #volume-slider {
+            width: 70px;
+            accent-color: var(--accent);
+        }
+        #volume-slider:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+        /* Timeline */
+        #timeline-area {
+            display: flex;
+            flex-direction: column;
+            padding: 6px 16px 10px;
+            gap: 4px;
+            overflow-x: auto;
+            max-height: 160px;
+            min-height: 100px;
+        }
+        .tl-track {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 36px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-xs);
+            padding: 2px 8px;
+            position: relative;
+            overflow-x: auto;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .tl-track:hover {
+            border-color: var(--border2);
+        }
+        .tl-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text2);
+            min-width: 50px;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+        .tl-clip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: grab;
+            flex-shrink: 0;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .tl-clip.video-clip {
+            background: rgba(59, 130, 246, 0.4);
+        }
+        .tl-clip.audio-clip {
+            background: rgba(245, 158, 11, 0.4);
+        }
+        .tl-clip.text-clip {
+            background: rgba(34, 197, 94, 0.4);
+        }
+        .tl-clip.emoji-clip {
+            background: rgba(245, 158, 11, 0.4);
+        }
+        .tl-clip:hover {
+            filter: brightness(1.3);
+        }
+        .tl-clip .clip-remove {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tl-clip .clip-remove:hover {
+            opacity: 1;
+            background: var(--danger);
+        }
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border2);
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        .modal h3 {
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+            color: var(--accent2);
+        }
+        .modal .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .emoji-grid button {
+            font-size: 1.5rem;
+            padding: 6px;
+            border-radius: var(--radius-xs);
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .emoji-grid button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border2);
+        }
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .sticker-grid button {
+            font-size: 2rem;
+            padding: 8px;
+            border-radius: var(--radius-xs);
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sticker-grid button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border2);
+            transform: scale(1.1);
+        }
+        .filter-preset-btn {
+            padding: 8px 14px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border2);
+            background: var(--glass2);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.78rem;
+            transition: var(--transition);
+            font-family: var(--font);
+            white-space: nowrap;
+        }
+        .filter-preset-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+        }
+        .filter-preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 300;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+        }
+        #toast.show {
+            opacity: 1;
+        }
+        /* Responsive */
+        @media (max-width: 900px) {
+            #left-panel {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                z-index: 150;
+                width: 240px;
+            }
+            #left-panel.mobile-open {
+                transform: translateX(0);
+            }
+            #right-panel {
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(100%);
+                z-index: 150;
+                width: 260px;
+            }
+            #right-panel.mobile-open {
+                transform: translateX(0);
+            }
+            #topbar {
+                gap: 4px;
+                padding: 6px 8px;
+                min-height: 44px;
+            }
+            .tb-btn {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+                gap: 3px;
+            }
+            #transport-controls {
+                gap: 4px;
+                padding: 6px 8px;
+            }
+            .ctrl-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+            .ctrl-btn.play-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+            #timeline-area {
+                padding: 4px 6px;
+                min-height: 70px;
+                max-height: 110px;
+            }
+            .tl-clip {
+                padding: 4px 8px;
+                font-size: 0.6rem;
+                max-width: 100px;
+            }
+        }
+        @media (max-width: 500px) {
+            #topbar .logo {
+                font-size: 0.9rem;
+            }
+            .tb-btn {
+                padding: 5px 6px;
+                font-size: 0.65rem;
+            }
+            #time-display {
+                font-size: 0.65rem;
+                min-width: 60px;
+            }
+            #volume-slider {
+                width: 40px;
+            }
+            #seek-bar-container {
+                min-width: 60px;
+            }
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        /* Animations */
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .recording-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 1s infinite;
+            display: inline-block;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Top Toolbar -->
+        <div id="topbar">
+            <span class="logo">🎬 Cap Video Editor Studio Maker Creator</span>
+            <div class="tb-sep"></div>
+            <button class="tb-btn" id="btn-import-video" title="Import Video">📹 Video</button>
+            <button class="tb-btn" id="btn-import-audio" title="Import Audio">🎵 Audio</button>
+            <button class="tb-btn" id="btn-add-text" title="Add Text">🔤 Text</button>
+            <button class="tb-btn" id="btn-emoji-picker" title="Emojis">😀 Emoji</button>
+            <button class="tb-btn" id="btn-sticker-picker" title="Stickers">⭐ Stickers</button>
+            <div class="tb-sep"></div>
+            <button class="tb-btn" id="btn-undo" title="Undo">↩️</button>
+            <button class="tb-btn" id="btn-redo" title="Redo">↪️</button>
+            <button class="tb-btn" id="btn-reset" title="Reset Project">🔄</button>
+            <button class="tb-btn" id="btn-save-project" title="Save Project">💾 Save</button>
+            <button class="tb-btn" id="btn-open-project" title="Open Project">📂 Open</button>
+            <div class="tb-sep"></div>
+            <button class="tb-btn accent" id="btn-export" title="Export Video">📤 Export</button>
+            <span style="flex:1;"></span>
+            <button class="tb-btn icon-only" id="btn-toggle-left" title="Toggle Panel">☰</button>
+            <button class="tb-btn icon-only" id="btn-toggle-right" title="Toggle Properties">⚙️</button>
+        </div>
+
+        <!-- Main Area -->
+        <div id="main-area">
+            <!-- Left Panel -->
+            <div id="left-panel">
+                <div class="panel-section">
+                    <div class="panel-title">🎬 Editing</div>
+                    <button class="panel-btn" data-action="trim"><span class="ico">✂️</span> Trim</button>
+                    <button class="panel-btn" data-action="cut"><span class="ico">🔪</span> Cut Selection</button>
+                    <button class="panel-btn" data-action="crop"><span class="ico">📐</span> Crop</button>
+                    <button class="panel-btn" data-action="rotate"><span class="ico">🔄</span> Rotate 90°</button>
+                    <button class="panel-btn" data-action="flip-h"><span class="ico">↔️</span> Flip Horizontal</button>
+                    <button class="panel-btn" data-action="flip-v"><span class="ico">↕️</span> Flip Vertical</button>
+                    <button class="panel-btn" data-action="resize"><span class="ico">📏</span> Resize</button>
+                    <button class="panel-btn" data-action="delete-media"><span class="ico">🗑️</span> Delete Media</button>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">🎨 Filters</div>
+                    <button class="panel-btn filter-btn" data-filter="brightness"><span class="ico">☀️</span> Brightness</button>
+                    <button class="panel-btn filter-btn" data-filter="contrast"><span class="ico">◑</span> Contrast</button>
+                    <button class="panel-btn filter-btn" data-filter="saturation"><span class="ico">🌈</span> Saturation</button>
+                    <button class="panel-btn filter-btn" data-filter="blur"><span class="ico">🌫️</span> Blur</button>
+                    <button class="panel-btn filter-btn" data-filter="vignette"><span class="ico">🔘</span> Vignette</button>
+                    <button class="panel-btn filter-btn" data-filter="grayscale"><span class="ico">⬜</span> Grayscale</button>
+                    <button class="panel-btn filter-btn" data-filter="invert"><span class="ico">🔲</span> Invert</button>
+                    <button class="panel-btn filter-btn" data-filter="sepia"><span class="ico">🟫</span> Sepia</button>
+                </div>
+                <div class="panel-section">
+                    <div class="panel-title">🔄 Transitions</div>
+                    <button class="panel-btn" data-transition="fade"><span class="ico">🌅</span> Fade</button>
+                    <button class="panel-btn" data-transition="zoom"><span class="ico">🔍</span> Zoom</button>
+                    <button class="panel-btn" data-transition="slide"><span class="ico">➡️</span> Slide</button>
+                    <button class="panel-btn" data-transition="flash"><span class="ico">💥</span> Flash</button>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div id="preview-area">
+                <div id="canvas-container">
+                    <canvas id="main-canvas" width="1280" height="720"></canvas>
+                </div>
+                <div id="drop-overlay">
+                    <span class="drop-icon">📁</span>
+                    <span>Drop video files here</span>
+                </div>
+            </div>
+
+            <!-- Right Panel (Properties) -->
+            <div id="right-panel">
+                <div class="prop-group" id="prop-text" style="display:none;">
+                    <label>📝 Text Content</label>
+                    <input type="text" id="text-content" value="Hello" style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+                    <label>Font Family</label>
+                    <select id="text-font">
+                        <option>Arial</option><option>Georgia</option><option>Impact</option><option>Courier New</option><option>Verdana</option><option>Comic Sans MS</option><option>Trebuchet MS</option>
+                    </select>
+                    <label>Font Size</label>
+                    <input type="range" id="text-size" min="12" max="200" value="48">
+                    <span id="text-size-val">48px</span>
+                    <label>Color</label>
+                    <input type="color" id="text-color" value="#ffffff">
+                    <label>Stroke Width</label>
+                    <input type="range" id="text-stroke" min="0" max="10" value="0">
+                    <label>Shadow Blur</label>
+                    <input type="range" id="text-shadow" min="0" max="30" value="0">
+                </div>
+                <div class="prop-group" id="prop-emoji" style="display:none;">
+                    <label>😀 Emoji Size</label>
+                    <input type="range" id="emoji-size" min="20" max="200" value="60">
+                    <label>Opacity</label>
+                    <input type="range" id="emoji-opacity" min="0" max="100" value="100">
+                    <label>Rotation</label>
+                    <input type="range" id="emoji-rotation" min="0" max="360" value="0">
+                </div>
+                <div class="prop-group" id="prop-filter" style="display:none;">
+                    <label id="filter-label">Filter Value</label>
+                    <input type="range" id="filter-value" min="0" max="200" value="100">
+                    <span id="filter-value-display">100</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;" id="filter-presets"></div>
+                </div>
+                <div class="prop-group" id="prop-speed">
+                    <label>⏱️ Playback Speed</label>
+                    <select id="speed-select">
+                        <option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option>
+                    </select>
+                </div>
+                <div class="prop-group" id="prop-music" style="display:none;">
+                    <label>🎵 Music Volume</label>
+                    <input type="range" id="music-volume" min="0" max="100" value="50">
+                    <label>Fade In (s)</label>
+                    <input type="range" id="music-fadein" min="0" max="5" step="0.1" value="0">
+                    <label>Fade Out (s)</label>
+                    <input type="range" id="music-fadeout" min="0" max="5" step="0.1" value="0">
+                    <label><input type="checkbox" id="music-loop"> Loop Music</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div id="bottom-bar">
+            <div id="transport-controls">
+                <button class="ctrl-btn" id="btn-stop" title="Stop">⏹</button>
+                <button class="ctrl-btn" id="btn-skip-back" title="Skip Back 5s">⏮</button>
+                <button class="ctrl-btn play-btn" id="btn-play" title="Play/Pause">▶</button>
+                <button class="ctrl-btn" id="btn-skip-fwd" title="Skip Forward 5s">⏭</button>
+                <div id="seek-bar-container">
+                    <span id="time-display">00:00 / 00:00</span>
+                    <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.01">
+                </div>
+                <div id="volume-container">
+                    <button class="ctrl-btn" id="btn-mute" title="Mute">🔊</button>
+                    <input type="range" id="volume-slider" min="0" max="100" value="80">
+                </div>
+                <button class="ctrl-btn" id="btn-fullscreen" title="Fullscreen">⛶</button>
+                <span style="font-size:0.7rem;color:var(--text2);" id="zoom-indicator">100%</span>
+                <button class="ctrl-btn" id="btn-zoom-out" title="Zoom Out">➖</button>
+                <input type="range" id="zoom-slider" min="50" max="200" value="100" style="width:60px;accent-color:var(--accent);">
+                <button class="ctrl-btn" id="btn-zoom-in" title="Zoom In">➕</button>
+            </div>
+            <div id="timeline-area">
+                <div class="tl-track" id="tl-video-track">
+                    <span class="tl-label">🎬 Video</span>
+                </div>
+                <div class="tl-track" id="tl-audio-track">
+                    <span class="tl-label">🎵 Audio</span>
+                </div>
+                <div class="tl-track" id="tl-text-track">
+                    <span class="tl-label">🔤 Text</span>
+                </div>
+                <div class="tl-track" id="tl-emoji-track">
+                    <span class="tl-label">😀 Emoji</span>
+                </div>
+            </div>
+        </div>
+        <!-- Hidden file inputs -->
+        <input type="file" id="file-input-video" accept="video/*,.mp4,.mov,.avi,.mkv,.webm" style="display:none;" multiple>
+        <input type="file" id="file-input-audio" accept="audio/*,.mp3,.wav,.aac,.m4a,.ogg" style="display:none;" multiple>
+        <input type="file" id="file-input-project" accept=".json" style="display:none;">
+    </div>
+    <!-- Toast -->
+    <div id="toast"></div>
+    <!-- Modal container -->
+    <div id="modal-container"></div>
+
+    <script>
+        (function() {
+            // ==================== DOM ELEMENTS ====================
+            const $ = (s) => document.querySelector(s);
+            const $$ = (s) => document.querySelectorAll(s);
+
+            const mainCanvas = $('#main-canvas');
+            const ctx = mainCanvas.getContext('2d');
+            const canvasContainer = $('#canvas-container');
+            const previewArea = $('#preview-area');
+            const dropOverlay = $('#drop-overlay');
+            const seekBar = $('#seek-bar');
+            const timeDisplay = $('#time-display');
+            const volumeSlider = $('#volume-slider');
+            const speedSelect = $('#speed-select');
+            const zoomSlider = $('#zoom-slider');
+            const zoomIndicator = $('#zoom-indicator');
+            const toast = $('#toast');
+            const modalContainer = $('#modal-container');
+            const btnPlay = $('#btn-play');
+            const btnMute = $('#btn-mute');
+            const leftPanel = $('#left-panel');
+            const rightPanel = $('#right-panel');
+
+            // ==================== STATE ====================
+            const state = {
+                videoSources: [],
+                audioSources: [],
+                currentVideoIndex: 0,
+                overlays: [],
+                selectedOverlayId: null,
+                isPlaying: false,
+                currentTime: 0,
+                duration: 0,
+                volume: 0.8,
+                muted: false,
+                speed: 1,
+                zoom: 1,
+                filters: {
+                    brightness: 100, contrast: 100, saturation: 100,
+                    vibrance: 100, exposure: 100, warmth: 0,
+                    blur: 0, vignette: 0, grayscale: 0,
+                    invert: 0, sepia: 0, sharpen: 0, glow: 0, hdr: 0
+                },
+                activeFilter: 'brightness',
+                transition: null,
+                transitionProgress: 0,
+                undoStack: [],
+                redoStack: [],
+                isDraggingOverlay: false,
+                dragOffsetX: 0, dragOffsetY: 0,
+                isResizingOverlay: false,
+                trimStart: 0, trimEnd: null,
+                cropRegion: null,
+                flipH: false, flipV: false,
+                rotation: 0,
+                musicGainNode: null, musicSource: null,
+                musicFadeIn: 0, musicFadeOut: 0,
+                musicLoop: false, musicVolume: 0.5,
+                exportProgress: 0, isExporting: false,
+                animationFrameId: null, lastFrameTime: 0,
+                isStopped: false
+            };
+
+            let overlayIdCounter = 0;
+            const generateId = () => 'ovl_' + (++overlayIdCounter);
+
+            // ==================== VIDEO ELEMENTS ====================
+            const videoElement = document.createElement('video');
+            videoElement.crossOrigin = 'anonymous';
+            videoElement.preload = 'auto';
+            videoElement.playsInline = true;
+            videoElement.setAttribute('playsinline', '');
+
+            let audioCtx = null;
+            const musicElement = document.createElement('audio');
+            musicElement.crossOrigin = 'anonymous';
+            musicElement.preload = 'auto';
+
+            // ==================== INITIALIZATION ====================
+            function init() {
+                setupEventListeners();
+                updateTimelineUI();
+                renderFrame(0);
+                updateTimeDisplay();
+                updateCanvasSize();
+                toastMsg('Ready! Import a video to begin. 🎬');
+            }
+
+            function setupEventListeners() {
+                // Video element events
+                videoElement.addEventListener('loadedmetadata', () => {
+                    if (state.trimEnd === null || state.trimEnd > videoElement.duration) {
+                        state.trimEnd = videoElement.duration;
+                    }
+                    state.duration = videoElement.duration;
+                    seekBar.max = state.duration * 100;
+                    updateTimeDisplay();
+                    updateTimelineUI();
+                    if (state.videoSources.length > 0 && state.videoSources[state.currentVideoIndex]) {
+                        state.videoSources[state.currentVideoIndex].duration = videoElement.duration;
+                    }
+                    saveState();
+                });
+
+                videoElement.addEventListener('timeupdate', () => {
+                    if (!state.isDraggingOverlay && !state.isResizingOverlay) {
+                        state.currentTime = videoElement.currentTime;
+                        seekBar.value = state.currentTime * 100;
+                        updateTimeDisplay();
+                    }
+                });
+
+                videoElement.addEventListener('ended', () => {
+                    state.isPlaying = false;
+                    btnPlay.textContent = '▶';
+                    if (state.musicLoop && musicElement.src) {
+                        videoElement.currentTime = state.trimStart;
+                        videoElement.play().catch(() => {});
+                    }
+                    if (state.animationFrameId) {
+                        cancelAnimationFrame(state.animationFrameId);
+                    }
+                });
+
+                videoElement.addEventListener('error', (e) => {
+                    console.warn('Video error:', e);
+                    toastMsg('Error loading video. Please try another file.');
+                });
+
+                // Play button
+                btnPlay.addEventListener('click', togglePlay);
+
+                // Stop button
+                $('#btn-stop').addEventListener('click', stopPlayback);
+
+                // Seek bar
+                seekBar.addEventListener('input', () => {
+                    const t = parseFloat(seekBar.value) / 100;
+                    videoElement.currentTime = Math.max(state.trimStart, Math.min(t, state.trimEnd || state.duration));
+                    state.currentTime = videoElement.currentTime;
+                    updateTimeDisplay();
+                    if (!state.isPlaying) {
+                        renderFrame(state.currentTime);
+                    }
+                });
+
+                seekBar.addEventListener('change', () => {
+                    if (!state.isPlaying) {
+                        renderFrame(state.currentTime);
+                    }
+                });
+
+                // Volume
+                volumeSlider.addEventListener('input', () => {
+                    state.volume = parseInt(volumeSlider.value) / 100;
+                    videoElement.volume = state.muted ? 0 : state.volume;
+                    if (state.musicGainNode) {
+                        state.musicGainNode.gain.value = state.musicVolume * (state.muted ? 0 : 1);
+                    }
+                });
+
+                // Mute
+                btnMute.addEventListener('click', () => {
+                    state.muted = !state.muted;
+                    videoElement.volume = state.muted ? 0 : state.volume;
+                    if (state.musicGainNode) {
+                        state.musicGainNode.gain.value = state.muted ? 0 : state.musicVolume;
+                    }
+                    btnMute.textContent = state.muted ? '🔇' : '🔊';
+                });
+
+                // Speed
+                speedSelect.addEventListener('change', () => {
+                    state.speed = parseFloat(speedSelect.value);
+                    videoElement.playbackRate = state.speed;
+                });
+
+                // Zoom
+                zoomSlider.addEventListener('input', () => {
+                    state.zoom = parseInt(zoomSlider.value) / 100;
+                    zoomIndicator.textContent = Math.round(state.zoom * 100) + '%';
+                    updateCanvasSize();
+                });
+
+                // Zoom buttons
+                $('#btn-zoom-in').addEventListener('click', () => {
+                    state.zoom = Math.min(2, state.zoom + 0.1);
+                    zoomSlider.value = state.zoom * 100;
+                    zoomIndicator.textContent = Math.round(state.zoom * 100) + '%';
+                    updateCanvasSize();
+                });
+
+                $('#btn-zoom-out').addEventListener('click', () => {
+                    state.zoom = Math.max(0.5, state.zoom - 0.1);
+                    zoomSlider.value = state.zoom * 100;
+                    zoomIndicator.textContent = Math.round(state.zoom * 100) + '%';
+                    updateCanvasSize();
+                });
+
+                // Fullscreen
+                $('#btn-fullscreen').addEventListener('click', () => {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    } else {
+                        previewArea.requestFullscreen().catch(() => {
+                            toastMsg('Fullscreen not supported');
+                        });
+                    }
+                });
+
+                // Skip buttons
+                $('#btn-skip-back').addEventListener('click', () => skipTime(-5));
+                $('#btn-skip-fwd').addEventListener('click', () => skipTime(5));
+
+                // Import buttons
+                $('#btn-import-video').addEventListener('click', () => $('#file-input-video').click());
+                $('#btn-import-audio').addEventListener('click', () => $('#file-input-audio').click());
+                $('#file-input-video').addEventListener('change', handleVideoImport);
+                $('#file-input-audio').addEventListener('change', handleAudioImport);
+
+                // Save/Load project
+                $('#btn-save-project').addEventListener('click', saveProjectToFile);
+                $('#btn-open-project').addEventListener('click', () => $('#file-input-project').click());
+                $('#file-input-project').addEventListener('change', loadProjectFromFile);
+
+                // Add text
+                $('#btn-add-text').addEventListener('click', addTextOverlay);
+
+                // Emoji picker
+                $('#btn-emoji-picker').addEventListener('click', openEmojiPicker);
+
+                // Sticker picker
+                $('#btn-sticker-picker').addEventListener('click', openStickerPicker);
+
+                // Undo/Redo/Reset
+                $('#btn-undo').addEventListener('click', undo);
+                $('#btn-redo').addEventListener('click', redo);
+                $('#btn-reset').addEventListener('click', resetProject);
+
+                // Export
+                $('#btn-export').addEventListener('click', openExportModal);
+
+                // Panel toggles
+                $('#btn-toggle-left').addEventListener('click', () => leftPanel.classList.toggle('mobile-open'));
+                $('#btn-toggle-right').addEventListener('click', () => rightPanel.classList.toggle('mobile-open'));
+
+                // Left panel action buttons
+                leftPanel.querySelectorAll('.panel-btn[data-action]').forEach(btn => {
+                    btn.addEventListener('click', () => handlePanelAction(btn.dataset.action));
+                });
+
+                // Filter buttons
+                leftPanel.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        state.activeFilter = btn.dataset.filter;
+                        updateFilterPanel();
+                    });
+                });
+
+                // Transition buttons
+                leftPanel.querySelectorAll('.panel-btn[data-transition]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        state.transition = btn.dataset.transition;
+                        state.transitionProgress = 0;
+                        toastMsg('Transition: ' + state.transition + ' (applied on playback)');
+                    });
+                });
+
+                // Right panel property listeners
+                $('#text-content').addEventListener('input', updateSelectedOverlay);
+                $('#text-font').addEventListener('change', updateSelectedOverlay);
+                $('#text-size').addEventListener('input', function() {
+                    $('#text-size-val').textContent = this.value + 'px';
+                    updateSelectedOverlay();
+                });
+                $('#text-color').addEventListener('input', updateSelectedOverlay);
+                $('#text-stroke').addEventListener('input', updateSelectedOverlay);
+                $('#text-shadow').addEventListener('input', updateSelectedOverlay);
+                $('#emoji-size').addEventListener('input', updateSelectedOverlay);
+                $('#emoji-opacity').addEventListener('input', updateSelectedOverlay);
+                $('#emoji-rotation').addEventListener('input', updateSelectedOverlay);
+                $('#filter-value').addEventListener('input', function() {
+                    $('#filter-value-display').textContent = this.value;
+                    applyFilterValue();
+                });
+                $('#music-volume').addEventListener('input', function() {
+                    state.musicVolume = parseInt(this.value) / 100;
+                    if (state.musicGainNode) {
+                        state.musicGainNode.gain.value = state.muted ? 0 : state.musicVolume;
+                    }
+                });
+                $('#music-fadein').addEventListener('input', function() { state.musicFadeIn = parseFloat(this.value); });
+                $('#music-fadeout').addEventListener('input', function() { state.musicFadeOut = parseFloat(this.value); });
+                $('#music-loop').addEventListener('change', function() {
+                    state.musicLoop = this.checked;
+                    musicElement.loop = state.musicLoop;
+                });
+
+                // Canvas mouse events
+                mainCanvas.addEventListener('mousedown', onCanvasMouseDown);
+                mainCanvas.addEventListener('mousemove', onCanvasMouseMove);
+                mainCanvas.addEventListener('mouseup', onCanvasMouseUp);
+                mainCanvas.addEventListener('wheel', onCanvasWheel);
+                mainCanvas.addEventListener('dblclick', onCanvasDoubleClick);
+
+                // Touch events
+                mainCanvas.addEventListener('touchstart', onCanvasTouchStart, { passive: false });
+                mainCanvas.addEventListener('touchmove', onCanvasTouchMove, { passive: false });
+                mainCanvas.addEventListener('touchend', onCanvasTouchEnd);
+
+                // Drag and drop
+                previewArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropOverlay.classList.add('visible');
+                });
+                previewArea.addEventListener('dragleave', () => dropOverlay.classList.remove('visible'));
+                previewArea.addEventListener('drop', handleDrop);
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (e.dataTransfer.types.includes('Files')) {
+                        dropOverlay.classList.add('visible');
+                    }
+                });
+                document.addEventListener('dragleave', (e) => {
+                    if (!e.relatedTarget || e.relatedTarget === document.documentElement) {
+                        dropOverlay.classList.remove('visible');
+                    }
+                });
+                document.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropOverlay.classList.remove('visible');
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        togglePlay();
+                    }
+                    if (e.code === 'KeyZ' && e.ctrlKey && !e.shiftKey) {
+                        e.preventDefault();
+                        undo();
+                    }
+                    if ((e.code === 'KeyZ' && e.ctrlKey && e.shiftKey) || (e.code === 'KeyY' && e.ctrlKey)) {
+                        e.preventDefault();
+                        redo();
+                    }
+                    if (e.code === 'ArrowLeft') skipTime(-1);
+                    if (e.code === 'ArrowRight') skipTime(1);
+                    if (e.code === 'Delete' && state.selectedOverlayId) {
+                        deleteSelectedOverlay();
+                    }
+                    if (e.code === 'KeyS' && e.ctrlKey) {
+                        e.preventDefault();
+                        saveProjectToFile();
+                    }
+                });
+
+                // Window resize
+                window.addEventListener('resize', updateCanvasSize);
+
+                // Initial filter presets
+                updateFilterPresets();
+            }
+
+            // ==================== VIDEO / AUDIO IMPORT ====================
+            function handleVideoImport(e) {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+
+                files.forEach(file => {
+                    if (!file.type.startsWith('video/') && !/\.(mp4|mov|avi|mkv|webm|ogg|flv|wmv)$/i.test(file.name)) {
+                        toastMsg('Unsupported format: ' + file.name);
+                        return;
+                    }
+                    const url = URL.createObjectURL(file);
+                    state.videoSources.push({ file, url, duration: 0, name: file.name });
+                });
+                e.target.value = '';
+
+                if (state.videoSources.length === files.length || state.videoSources.length === 1) {
+                    loadVideoSource(state.videoSources.length - files.length);
+                }
+                updateTimelineUI();
+                saveState();
+                toastMsg(`Imported ${files.length} video(s)`);
+            }
+
+            function handleAudioImport(e) {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+
+                files.forEach(file => {
+                    const url = URL.createObjectURL(file);
+                    state.audioSources.push({ file, url, duration: 0, name: file.name, audioBuffer: null });
+                });
+                e.target.value = '';
+
+                if (state.audioSources.length > 0) {
+                    loadMusicSource(state.audioSources.length - 1);
+                }
+                updateTimelineUI();
+                saveState();
+                toastMsg(`Imported ${files.length} audio file(s)`);
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                dropOverlay.classList.remove('visible');
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length === 0) return;
+
+                const videoFiles = files.filter(f =>
+                    f.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm)$/i.test(f.name)
+                );
+                const audioFiles = files.filter(f =>
+                    f.type.startsWith('audio/') || /\.(mp3|wav|aac|m4a|ogg)$/i.test(f.name)
+                );
+
+                videoFiles.forEach(file => {
+                    const url = URL.createObjectURL(file);
+                    state.videoSources.push({ file, url, duration: 0, name: file.name });
+                });
+                audioFiles.forEach(file => {
+                    const url = URL.createObjectURL(file);
+                    state.audioSources.push({ file, url, duration: 0, name: file.name, audioBuffer: null });
+                });
+
+                if (videoFiles.length > 0) {
+                    loadVideoSource(state.videoSources.length - videoFiles.length - audioFiles.length);
+                }
+                if (audioFiles.length > 0) {
+                    loadMusicSource(state.audioSources.length - 1);
+                }
+                updateTimelineUI();
+                saveState();
+                toastMsg(`Dropped ${videoFiles.length} video(s), ${audioFiles.length} audio(s)`);
+            }
+
+            function loadVideoSource(index) {
+                if (index < 0 || index >= state.videoSources.length) return;
+                state.currentVideoIndex = index;
+                const src = state.videoSources[index];
+                videoElement.src = src.url;
+                videoElement.load();
+                videoElement.currentTime = 0;
+                state.currentTime = 0;
+                state.trimStart = 0;
+                state.trimEnd = null;
+                state.isPlaying = false;
+                state.isStopped = false;
+                btnPlay.textContent = '▶';
+                seekBar.value = 0;
+                updateTimelineUI();
+                toastMsg('Loaded: ' + src.name);
+            }
+
+            function loadMusicSource(index) {
+                if (index < 0 || index >= state.audioSources.length) return;
+                const src = state.audioSources[index];
+                musicElement.src = src.url;
+                musicElement.load();
+                musicElement.loop = state.musicLoop;
+                $('#prop-music').style.display = 'block';
+                toastMsg('Music loaded: ' + src.name);
+                initAudioContext();
+            }
+
+            function initAudioContext() {
+                if (!audioCtx) {
+                    try {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const source = audioCtx.createMediaElementSource(musicElement);
+                        state.musicGainNode = audioCtx.createGain();
+                        state.musicGainNode.gain.value = state.muted ? 0 : state.musicVolume;
+                        source.connect(state.musicGainNode);
+                        state.musicGainNode.connect(audioCtx.destination);
+                        state.musicSource = source;
+                    } catch (e) {
+                        console.warn('Audio context initialization failed:', e);
+                    }
+                }
+            }
+
+            // ==================== PLAYBACK CONTROLS ====================
+            function togglePlay() {
+                if (state.videoSources.length === 0) {
+                    toastMsg('Please import a video first');
+                    return;
+                }
+                if (state.isPlaying) {
+                    pausePlayback();
+                } else {
+                    startPlayback();
+                }
+            }
+
+            function startPlayback() {
+                if (videoElement.readyState < 2) {
+                    toastMsg('Video not ready yet...');
+                    return;
+                }
+                if (videoElement.currentTime < state.trimStart || videoElement.currentTime >= (state.trimEnd || state.duration)) {
+                    videoElement.currentTime = state.trimStart;
+                }
+                videoElement.playbackRate = state.speed;
+                videoElement.play().then(() => {
+                    state.isPlaying = true;
+                    state.isStopped = false;
+                    btnPlay.textContent = '⏸';
+                    if (state.audioSources.length > 0 && musicElement.src) {
+                        musicElement.currentTime = videoElement.currentTime;
+                        musicElement.play().catch(() => {});
+                    }
+                    state.lastFrameTime = performance.now();
+                    if (state.animationFrameId) cancelAnimationFrame(state.animationFrameId);
+                    renderLoop();
+                }).catch((err) => {
+                    console.warn('Playback failed:', err);
+                    toastMsg('Playback failed. Try again.');
+                });
+            }
+
+            function pausePlayback() {
+                videoElement.pause();
+                musicElement.pause();
+                state.isPlaying = false;
+                btnPlay.textContent = '▶';
+                if (state.animationFrameId) {
+                    cancelAnimationFrame(state.animationFrameId);
+                    state.animationFrameId = null;
+                }
+            }
+
+            function stopPlayback() {
+                videoElement.pause();
+                musicElement.pause();
+                state.isPlaying = false;
+                state.isStopped = true;
+                btnPlay.textContent = '▶';
+                videoElement.currentTime = state.trimStart;
+                state.currentTime = state.trimStart;
+                seekBar.value = state.trimStart * 100;
+                updateTimeDisplay();
+                renderFrame(state.currentTime);
+                if (state.animationFrameId) {
+                    cancelAnimationFrame(state.animationFrameId);
+                    state.animationFrameId = null;
+                }
+                toastMsg('Stopped');
+            }
+
+            function skipTime(seconds) {
+                if (state.videoSources.length === 0) return;
+                const trimEnd = state.trimEnd || state.duration;
+                const newTime = Math.max(state.trimStart, Math.min(videoElement.currentTime + seconds, trimEnd));
+                videoElement.currentTime = newTime;
+                state.currentTime = newTime;
+                seekBar.value = newTime * 100;
+                updateTimeDisplay();
+                if (!state.isPlaying) {
+                    renderFrame(state.currentTime);
+                }
+            }
+
+            function renderLoop(timestamp) {
+                if (!state.isPlaying) return;
+                if (!timestamp) timestamp = performance.now();
+                const elapsed = (timestamp - state.lastFrameTime) / 1000;
+                state.lastFrameTime = timestamp;
+
+                const trimEnd = state.trimEnd || state.duration;
+                if (videoElement.currentTime >= trimEnd) {
+                    stopPlayback();
+                    return;
+                }
+
+                state.currentTime = videoElement.currentTime;
+                seekBar.value = state.currentTime * 100;
+                updateTimeDisplay();
+                renderFrame(state.currentTime);
+
+                if (state.transition && state.transitionProgress < 1) {
+                    state.transitionProgress = Math.min(1, state.transitionProgress + elapsed * 2);
+                }
+
+                state.animationFrameId = requestAnimationFrame(renderLoop);
+            }
+
+            function updateTimeDisplay() {
+                const ct = state.currentTime || 0;
+                const dur = state.trimEnd || state.duration || 0;
+                timeDisplay.textContent = formatTime(ct) + ' / ' + formatTime(dur);
+            }
+
+            function formatTime(sec) {
+                if (!isFinite(sec) || sec < 0) return '00:00';
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+            }
+
+            // ==================== CANVAS RENDERING ====================
+            function updateCanvasSize() {
+                const containerW = canvasContainer.clientWidth;
+                const containerH = canvasContainer.clientHeight;
+                const baseW = 1280;
+                const baseH = 720;
+                const scale = Math.min(containerW / baseW, containerH / baseH) * state.zoom;
+                mainCanvas.style.width = (baseW * scale) + 'px';
+                mainCanvas.style.height = (baseH * scale) + 'px';
+            }
+
+            function renderFrame(t) {
+                const w = mainCanvas.width;
+                const h = mainCanvas.height;
+                ctx.clearRect(0, 0, w, h);
+
+                // Draw video frame or placeholder
+                if (videoElement.readyState >= 2 && state.videoSources.length > 0 && !state.isStopped) {
+                    ctx.save();
+                    ctx.translate(w / 2, h / 2);
+                    if (state.rotation) ctx.rotate(state.rotation * Math.PI / 180);
+                    if (state.flipH) ctx.scale(-1, 1);
+                    if (state.flipV) ctx.scale(1, -1);
+
+                    let sx = 0, sy = 0, sw = videoElement.videoWidth, sh = videoElement.videoHeight;
+                    if (state.cropRegion) {
+                        sx = state.cropRegion.x;
+                        sy = state.cropRegion.y;
+                        sw = state.cropRegion.w;
+                        sh = state.cropRegion.h;
+                    }
+                    ctx.drawImage(videoElement, sx, sy, sw, sh, -w / 2, -h / 2, w, h);
+                    ctx.restore();
+                    applyCanvasFilters();
+                } else {
+                    ctx.fillStyle = '#1E293B';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.fillStyle = '#CBD5E1';
+                    ctx.font = '30px ' + getComputedStyle(document.body).fontFamily;
+                    ctx.textAlign = 'center';
+                    ctx.fillText('📹 Import a video to start', w / 2, h / 2);
+                }
+
+                // Draw overlays
+                state.overlays.forEach(ovl => drawOverlay(ovl));
+
+                // Draw transition
+                if (state.transition && state.transitionProgress > 0 && state.transitionProgress < 1) {
+                    drawTransition();
+                }
+
+                // Draw crop indicator
+                if (state.cropRegion && videoElement.readyState >= 2) {
+                    ctx.strokeStyle = '#3B82F6';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([10, 5]);
+                    const cr = state.cropRegion;
+                    const scaleX = w / videoElement.videoWidth;
+                    const scaleY = h / videoElement.videoHeight;
+                    ctx.strokeRect(cr.x * scaleX, cr.y * scaleY, cr.w * scaleX, cr.h * scaleY);
+                    ctx.setLineDash([]);
+                }
+            }
+
+            function applyCanvasFilters() {
+                const f = state.filters;
+                let filterStr = '';
+                filterStr += `brightness(${f.brightness / 100}) `;
+                filterStr += `contrast(${f.contrast / 100}) `;
+                filterStr += `saturate(${f.saturation / 100}) `;
+                if (f.blur > 0) filterStr += `blur(${f.blur / 10}px) `;
+                if (f.grayscale > 0) filterStr += `grayscale(${f.grayscale}%) `;
+                if (f.invert > 0) filterStr += `invert(${f.invert}%) `;
+                if (f.sepia > 0) filterStr += `sepia(${f.sepia}%) `;
+                ctx.filter = filterStr.trim() || 'none';
+            }
+
+            function drawOverlay(ovl) {
+                ctx.save();
+                ctx.globalAlpha = ovl.opacity !== undefined ? ovl.opacity : 1;
+                const cx = ovl.x + ovl.width / 2;
+                const cy = ovl.y + ovl.height / 2;
+                ctx.translate(cx, cy);
+                if (ovl.rotation) ctx.rotate(ovl.rotation * Math.PI / 180);
+                ctx.translate(-ovl.width / 2, -ovl.height / 2);
+
+                if (ovl.type === 'text') {
+                    ctx.font = `${ovl.fontSize || 48}px "${ovl.font || 'Arial'}"`;
+                    ctx.fillStyle = ovl.fontColor || '#ffffff';
+                    ctx.textBaseline = 'top';
+                    if (ovl.shadowBlur > 0) {
+                        ctx.shadowColor = 'rgba(0,0,0,0.7)';
+                        ctx.shadowBlur = ovl.shadowBlur;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                    }
+                    if (ovl.strokeWidth > 0) {
+                        ctx.strokeStyle = '#000';
+                        ctx.lineWidth = ovl.strokeWidth;
+                        ctx.strokeText(ovl.content, 0, 0);
+                    }
+                    ctx.fillText(ovl.content, 0, 0);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                } else if (ovl.type === 'emoji' || ovl.type === 'sticker') {
+                    ctx.font = `${ovl.height || 60}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(ovl.content, 0, 0);
+                }
+
+                if (ovl.id === state.selectedOverlayId) {
+                    ctx.strokeStyle = '#3B82F6';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeRect(-2, -2, ovl.width + 4, ovl.height + 4);
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = '#3B82F6';
+                    ctx.fillRect(ovl.width - 6, ovl.height - 6, 12, 12);
+                }
+                ctx.restore();
+            }
+
+            function drawTransition() {
+                const p = state.transitionProgress;
+                const w = mainCanvas.width;
+                const h = mainCanvas.height;
+                ctx.save();
+                ctx.globalAlpha = 1 - p;
+                if (state.transition === 'fade') {
+                    ctx.fillStyle = '#020617';
+                    ctx.fillRect(0, 0, w, h);
+                } else if (state.transition === 'zoom') {
+                    ctx.fillStyle = '#020617';
+                    const s = 1 + p * 2;
+                    ctx.translate(w / 2, h / 2);
+                    ctx.scale(s, s);
+                    ctx.fillRect(-w, -h, w * 2, h * 2);
+                } else if (state.transition === 'slide') {
+                    ctx.fillStyle = '#020617';
+                    ctx.fillRect(w * (1 - p), 0, w, h);
+                } else if (state.transition === 'flash') {
+                    ctx.fillStyle = 'rgba(255,255,255,' + (1 - p) + ')';
+                    ctx.fillRect(0, 0, w, h);
+                }
+                ctx.restore();
+            }
+
+            // ==================== OVERLAY MANAGEMENT ====================
+            function addTextOverlay() {
+                const ovl = {
+                    type: 'text',
+                    x: mainCanvas.width / 2 - 100,
+                    y: mainCanvas.height / 2 - 30,
+                    width: 200,
+                    height: 60,
+                    rotation: 0,
+                    opacity: 1,
+                    content: 'Your Text',
+                    font: 'Arial',
+                    fontSize: 48,
+                    fontColor: '#ffffff',
+                    strokeWidth: 0,
+                    shadowBlur: 0,
+                    id: generateId(),
+                };
+                state.overlays.push(ovl);
+                state.selectedOverlayId = ovl.id;
+                updatePropertiesPanel(ovl);
+                updateTimelineUI();
+                renderFrame(state.currentTime);
+                saveState();
+                toastMsg('Text added - drag to move');
+            }
+
+            function addEmojiOverlay(emoji) {
+                const ovl = {
+                    type: 'emoji',
+                    x: mainCanvas.width / 2 - 30,
+                    y: mainCanvas.height / 2 - 30,
+                    width: 60,
+                    height: 60,
+                    rotation: 0,
+                    opacity: 1,
+                    content: emoji,
+                    id: generateId(),
+                };
+                state.overlays.push(ovl);
+                state.selectedOverlayId = ovl.id;
+                updatePropertiesPanel(ovl);
+                updateTimelineUI();
+                renderFrame(state.currentTime);
+                saveState();
+            }
+
+            function addStickerOverlay(sticker) {
+                const ovl = {
+                    type: 'sticker',
+                    x: mainCanvas.width / 2 - 40,
+                    y: mainCanvas.height / 2 - 40,
+                    width: 80,
+                    height: 80,
+                    rotation: 0,
+                    opacity: 1,
+                    content: sticker,
+                    id: generateId(),
+                };
+                state.overlays.push(ovl);
+                state.selectedOverlayId = ovl.id;
+                updatePropertiesPanel(ovl);
+                updateTimelineUI();
+                renderFrame(state.currentTime);
+                saveState();
+            }
+
+            function updateSelectedOverlay() {
+                const ovl = state.overlays.find(o => o.id === state.selectedOverlayId);
+                if (!ovl) return;
+                if (ovl.type === 'text') {
+                    ovl.content = $('#text-content').value;
+                    ovl.font = $('#text-font').value;
+                    ovl.fontSize = parseInt($('#text-size').value);
+                    ovl.fontColor = $('#text-color').value;
+                    ovl.strokeWidth = parseInt($('#text-stroke').value);
+                    ovl.shadowBlur = parseInt($('#text-shadow').value);
+                    ovl.width = Math.max(40, ovl.fontSize * ovl.content.length * 0.55);
+                    ovl.height = ovl.fontSize * 1.3;
+                } else if (ovl.type === 'emoji' || ovl.type === 'sticker') {
+                    const sz = parseInt($('#emoji-size').value);
+                    ovl.width = sz;
+                    ovl.height = sz;
+                    ovl.opacity = parseInt($('#emoji-opacity').value) / 100;
+                    ovl.rotation = parseInt($('#emoji-rotation').value);
+                }
+                renderFrame(state.currentTime);
+                saveState();
+            }
+
+            function updatePropertiesPanel(ovl) {
+                if (!ovl) {
+                    $('#prop-text').style.display = 'none';
+                    $('#prop-emoji').style.display = 'none';
+                    return;
+                }
+                if (ovl.type === 'text') {
+                    $('#prop-text').style.display = 'block';
+                    $('#prop-emoji').style.display = 'none';
+                    $('#text-content').value = ovl.content;
+                    $('#text-font').value = ovl.font || 'Arial';
+                    $('#text-size').value = ovl.fontSize || 48;
+                    $('#text-size-val').textContent = (ovl.fontSize || 48) + 'px';
+                    $('#text-color').value = ovl.fontColor || '#ffffff';
+                    $('#text-stroke').value = ovl.strokeWidth || 0;
+                    $('#text-shadow').value = ovl.shadowBlur || 0;
+                } else if (ovl.type === 'emoji' || ovl.type === 'sticker') {
+                    $('#prop-text').style.display = 'none';
+                    $('#prop-emoji').style.display = 'block';
+                    $('#emoji-size').value = ovl.width || 60;
+                    $('#emoji-opacity').value = (ovl.opacity || 1) * 100;
+                    $('#emoji-rotation').value = ovl.rotation || 0;
+                }
+            }
+
+            function deleteSelectedOverlay() {
+                if (!state.selectedOverlayId) return;
+                state.overlays = state.overlays.filter(o => o.id !== state.selectedOverlayId);
+                state.selectedOverlayId = null;
+                $('#prop-text').style.display = 'none';
+                $('#prop-emoji').style.display = 'none';
+                updateTimelineUI();
+                renderFrame(state.currentTime);
+                saveState();
+                toastMsg('Overlay deleted');
+            }
+
+            // ==================== CANVAS INTERACTION ====================
+            function getCanvasPos(e) {
+                const rect = mainCanvas.getBoundingClientRect();
+                const scaleX = mainCanvas.width / rect.width;
+                const scaleY = mainCanvas.height / rect.height;
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY,
+                };
+            }
+
+            function findOverlayAt(cx, cy) {
+                for (let i = state.overlays.length - 1; i >= 0; i--) {
+                    const o = state.overlays[i];
+                    const ocx = o.x + o.width / 2;
+                    const ocy = o.y + o.height / 2;
+                    const dx = Math.abs(cx - ocx);
+                    const dy = Math.abs(cy - ocy);
+                    if (dx < o.width / 2 + 8 && dy < o.height / 2 + 8) {
+                        const nearResize = cx > o.x + o.width - 14 && cy > o.y + o.height - 14;
+                        return { overlay: o, nearResize };
+                    }
+                }
+                return null;
+            }
+
+            function onCanvasMouseDown(e) {
+                const pos = getCanvasPos(e);
+                const found = findOverlayAt(pos.x, pos.y);
+                if (found) {
+                    state.selectedOverlayId = found.overlay.id;
+                    updatePropertiesPanel(found.overlay);
+                    if (found.nearResize) {
+                        state.isResizingOverlay = true;
+                        state.dragOffsetX = pos.x;
+                        state.dragOffsetY = pos.y;
+                    } else {
+                        state.isDraggingOverlay = true;
+                        state.dragOffsetX = pos.x - found.overlay.x;
+                        state.dragOffsetY = pos.y - found.overlay.y;
+                    }
+                    mainCanvas.style.cursor = found.nearResize ? 'nwse-resize' : 'move';
+                } else {
+                    state.selectedOverlayId = null;
+                    updatePropertiesPanel(null);
+                    mainCanvas.style.cursor = 'default';
+                }
+                renderFrame(state.currentTime);
+            }
+
+            function onCanvasMouseMove(e) {
+                if (!state.isDraggingOverlay && !state.isResizingOverlay) {
+                    const pos = getCanvasPos(e);
+                    const found = findOverlayAt(pos.x, pos.y);
+                    mainCanvas.style.cursor = found ? (found.nearResize ? 'nwse-resize' : 'move') : 'default';
+                    return;
+                }
+                const pos = getCanvasPos(e);
+                const ovl = state.overlays.find(o => o.id === state.selectedOverlayId);
+                if (!ovl) return;
+                if (state.isDraggingOverlay) {
+                    ovl.x = pos.x - state.dragOffsetX;
+                    ovl.y = pos.y - state.dragOffsetY;
+                } else if (state.isResizingOverlay) {
+                    ovl.width = Math.max(20, pos.x - ovl.x);
+                    ovl.height = Math.max(20, pos.y - ovl.y);
+                    if (ovl.type === 'emoji' || ovl.type === 'sticker') {
+                        $('#emoji-size').value = Math.round(ovl.width);
+                    }
+                }
+                renderFrame(state.currentTime);
+            }
+
+            function onCanvasMouseUp() {
+                if (state.isDraggingOverlay || state.isResizingOverlay) {
+                    state.isDraggingOverlay = false;
+                    state.isResizingOverlay = false;
+                    mainCanvas.style.cursor = 'default';
+                    saveState();
+                }
+            }
+
+            function onCanvasWheel(e) {
+                if (state.selectedOverlayId) {
+                    e.preventDefault();
+                    const ovl = state.overlays.find(o => o.id === state.selectedOverlayId);
+                    if (ovl) {
+                        ovl.rotation = (ovl.rotation || 0) + (e.deltaY > 0 ? 5 : -5);
+                        if (ovl.type === 'emoji' || ovl.type === 'sticker') {
+                            $('#emoji-rotation').value = ovl.rotation % 360;
+                        }
+                        renderFrame(state.currentTime);
+                        saveState();
+                    }
+                }
+            }
+
+            function onCanvasDoubleClick(e) {
+                const pos = getCanvasPos(e);
+                const found = findOverlayAt(pos.x, pos.y);
+                if (found && found.overlay.type === 'text') {
+                    const newContent = prompt('Edit text:', found.overlay.content);
+                    if (newContent !== null) {
+                        found.overlay.content = newContent;
+                        $('#text-content').value = newContent;
+                        renderFrame(state.currentTime);
+                        saveState();
+                    }
+                }
+            }
+
+            function onCanvasTouchStart(e) {
+                if (e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    const pos = getCanvasPos(touch);
+                    const found = findOverlayAt(pos.x, pos.y);
+                    if (found) {
+                        e.preventDefault();
+                        state.selectedOverlayId = found.overlay.id;
+                        updatePropertiesPanel(found.overlay);
+                        state.isDraggingOverlay = true;
+                        state.dragOffsetX = pos.x - found.overlay.x;
+                        state.dragOffsetY = pos.y - found.overlay.y;
+                    }
+                }
+            }
+
+            function onCanvasTouchMove(e) {
+                if (state.isDraggingOverlay && e.touches.length === 1) {
+                    e.preventDefault();
+                    const pos = getCanvasPos(e.touches[0]);
+                    const ovl = state.overlays.find(o => o.id === state.selectedOverlayId);
+                    if (ovl) {
+                        ovl.x = pos.x - state.dragOffsetX;
+                        ovl.y = pos.y - state.dragOffsetY;
+                        renderFrame(state.currentTime);
+                    }
+                }
+            }
+
+            function onCanvasTouchEnd() {
+                if (state.isDraggingOverlay) {
+                    state.isDraggingOverlay = false;
+                    saveState();
+                }
+            }
+
+            // ==================== PANEL ACTIONS ====================
+            function handlePanelAction(action) {
+                switch (action) {
+                    case 'trim': openTrimModal(); break;
+                    case 'cut': cutCurrentSegment(); break;
+                    case 'crop': toggleCropMode(); break;
+                    case 'rotate':
+                        state.rotation = (state.rotation + 90) % 360;
+                        renderFrame(state.currentTime);
+                        saveState();
+                        toastMsg('Rotated: ' + state.rotation + '°');
+                        break;
+                    case 'flip-h':
+                        state.flipH = !state.flipH;
+                        renderFrame(state.currentTime);
+                        saveState();
+                        toastMsg('Flip Horizontal: ' + (state.flipH ? 'ON' : 'OFF'));
+                        break;
+                    case 'flip-v':
+                        state.flipV = !state.flipV;
+                        renderFrame(state.currentTime);
+                        saveState();
+                        toastMsg('Flip Vertical: ' + (state.flipV ? 'ON' : 'OFF'));
+                        break;
+                    case 'resize': openResizeModal(); break;
+                    case 'delete-media': deleteCurrentMedia(); break;
+                }
+            }
+
+            function cutCurrentSegment() {
+                if (state.videoSources.length === 0) return;
+                const ct = state.currentTime;
+                if (ct > state.trimStart && ct < (state.trimEnd || state.duration)) {
+                    state.trimStart = ct;
+                    videoElement.currentTime = ct;
+                    seekBar.value = ct * 100;
+                    updateTimeDisplay();
+                    updateTimelineUI();
+                    saveState();
+                    toastMsg('Cut: new start at ' + formatTime(ct));
+                } else {
+                    toastMsg('Position cursor within video to cut');
+                }
+            }
+
+            function toggleCropMode() {
+                if (state.cropRegion) {
+                    state.cropRegion = null;
+                    toastMsg('Crop removed');
+                } else {
+                    const vw = videoElement.videoWidth || 1280;
+                    const vh = videoElement.videoHeight || 720;
+                    state.cropRegion = { x: vw * 0.1, y: vh * 0.1, w: vw * 0.8, h: vh * 0.8 };
+                    toastMsg('Crop mode ON');
+                }
+                renderFrame(state.currentTime);
+                saveState();
+            }
+
+            function deleteCurrentMedia() {
+                if (state.videoSources.length === 0 && state.audioSources.length === 0) {
+                    toastMsg('No media to delete');
+                    return;
+                }
+                const html = `
+                    <div class="modal-overlay" id="delete-modal-overlay">
+                        <div class="modal">
+                            <h3>🗑️ Delete Media</h3>
+                            <p>Select media to remove:</p>
+                            <div class="btn-row" style="flex-direction:column;">
+                                ${state.videoSources.length > 0 ? '<button class="tb-btn" id="del-current-video">🎬 Delete current video</button>' : ''}
+                                ${state.audioSources.length > 0 ? '<button class="tb-btn" id="del-all-audio">🎵 Delete all audio</button>' : ''}
+                                <button class="tb-btn" id="del-all-overlays">🔤 Delete all overlays</button>
+                            </div>
+                            <button class="tb-btn" id="delete-cancel" style="margin-top:10px;">Cancel</button>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+
+                const closeModal = () => { modalContainer.innerHTML = ''; };
+
+                if (state.videoSources.length > 0) {
+                    $('#del-current-video').addEventListener('click', () => {
+                        if (state.videoSources.length <= 1) {
+                            toastMsg('Cannot delete last video');
+                            return;
+                        }
+                        URL.revokeObjectURL(state.videoSources[state.currentVideoIndex].url);
+                        state.videoSources.splice(state.currentVideoIndex, 1);
+                        if (state.currentVideoIndex >= state.videoSources.length) {
+                            state.currentVideoIndex = state.videoSources.length - 1;
+                        }
+                        loadVideoSource(state.currentVideoIndex);
+                        updateTimelineUI();
+                        saveState();
+                        closeModal();
+                        toastMsg('Video deleted');
+                    });
+                }
+                if (state.audioSources.length > 0) {
+                    $('#del-all-audio').addEventListener('click', () => {
+                        state.audioSources.forEach(s => URL.revokeObjectURL(s.url));
+                        state.audioSources = [];
+                        musicElement.src = '';
+                        $('#prop-music').style.display = 'none';
+                        updateTimelineUI();
+                        saveState();
+                        closeModal();
+                        toastMsg('All audio deleted');
+                    });
+                }
+                $('#del-all-overlays').addEventListener('click', () => {
+                    state.overlays = [];
+                    state.selectedOverlayId = null;
+                    updatePropertiesPanel(null);
+                    updateTimelineUI();
+                    renderFrame(state.currentTime);
+                    saveState();
+                    closeModal();
+                    toastMsg('All overlays deleted');
+                });
+                $('#delete-cancel').addEventListener('click', closeModal);
+                $('#delete-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) closeModal();
+                });
+            }
+
+            function openTrimModal() {
+                const dur = state.trimEnd || state.duration || 0;
+                const html = `
+                    <div class="modal-overlay" id="trim-modal-overlay">
+                        <div class="modal">
+                            <h3>✂️ Trim Video</h3>
+                            <label>Start Time (seconds):</label>
+                            <input type="range" id="trim-start-slider" min="0" max="${Math.floor(dur)}" value="${state.trimStart}" step="0.1" style="width:100%;">
+                            <span id="trim-start-val">${state.trimStart.toFixed(1)}s</span>
+                            <label>End Time (seconds):</label>
+                            <input type="range" id="trim-end-slider" min="0" max="${Math.floor(dur)}" value="${state.trimEnd || dur}" step="0.1" style="width:100%;">
+                            <span id="trim-end-val">${(state.trimEnd || dur).toFixed(1)}s</span>
+                            <div class="btn-row">
+                                <button class="tb-btn accent" id="trim-apply">Apply Trim</button>
+                                <button class="tb-btn" id="trim-cancel">Cancel</button>
+                                <button class="tb-btn" id="trim-reset">Reset</button>
+                            </div>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+
+                const updateVals = () => {
+                    $('#trim-start-val').textContent = parseFloat($('#trim-start-slider').value).toFixed(1) + 's';
+                    $('#trim-end-val').textContent = parseFloat($('#trim-end-slider').value).toFixed(1) + 's';
+                };
+
+                $('#trim-start-slider').addEventListener('input', updateVals);
+                $('#trim-end-slider').addEventListener('input', updateVals);
+                $('#trim-apply').addEventListener('click', () => {
+                    state.trimStart = parseFloat($('#trim-start-slider').value);
+                    state.trimEnd = parseFloat($('#trim-end-slider').value);
+                    if (state.trimEnd <= state.trimStart) state.trimEnd = state.trimStart + 0.1;
+                    videoElement.currentTime = state.trimStart;
+                    state.currentTime = state.trimStart;
+                    seekBar.value = state.trimStart * 100;
+                    updateTimeDisplay();
+                    updateTimelineUI();
+                    saveState();
+                    modalContainer.innerHTML = '';
+                    toastMsg('Trim applied');
+                });
+                $('#trim-cancel').addEventListener('click', () => { modalContainer.innerHTML = ''; });
+                $('#trim-reset').addEventListener('click', () => {
+                    state.trimStart = 0;
+                    state.trimEnd = state.duration || 0;
+                    $('#trim-start-slider').value = 0;
+                    $('#trim-end-slider').value = state.duration || 0;
+                    updateVals();
+                });
+                $('#trim-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) modalContainer.innerHTML = '';
+                });
+            }
+
+            function openResizeModal() {
+                const html = `
+                    <div class="modal-overlay" id="resize-modal-overlay">
+                        <div class="modal">
+                            <h3>📏 Resize Canvas</h3>
+                            <label>Width:</label>
+                            <input type="number" id="resize-w" value="${mainCanvas.width}" min="320" max="3840" style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+                            <label>Height:</label>
+                            <input type="number" id="resize-h" value="${mainCanvas.height}" min="240" max="2160" style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+                            <div class="btn-row">
+                                <button class="tb-btn accent" id="resize-apply">Apply</button>
+                                <button class="tb-btn" id="resize-cancel">Cancel</button>
+                                <button class="tb-btn" id="resize-preset-720">720p</button>
+                                <button class="tb-btn" id="resize-preset-1080">1080p</button>
+                            </div>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+
+                $('#resize-apply').addEventListener('click', () => {
+                    mainCanvas.width = parseInt($('#resize-w').value);
+                    mainCanvas.height = parseInt($('#resize-h').value);
+                    updateCanvasSize();
+                    renderFrame(state.currentTime);
+                    saveState();
+                    modalContainer.innerHTML = '';
+                    toastMsg('Canvas resized');
+                });
+                $('#resize-cancel').addEventListener('click', () => { modalContainer.innerHTML = ''; });
+                $('#resize-preset-720').addEventListener('click', () => {
+                    $('#resize-w').value = 1280;
+                    $('#resize-h').value = 720;
+                });
+                $('#resize-preset-1080').addEventListener('click', () => {
+                    $('#resize-w').value = 1920;
+                    $('#resize-h').value = 1080;
+                });
+                $('#resize-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) modalContainer.innerHTML = '';
+                });
+            }
+
+            function openEmojiPicker() {
+                const emojis = ['😀','😂','🥰','😎','🤩','😇','😈','💀','👻','🎃','🌟','❤️','🔥','💯','✅','⭐','🎉','💡','📌','🎵','🌈','🍕','🐱','🐶','🦄','🌺','💎','🎯','🚀','⚡','🍀','💪','👑','🎨','📷','💻'];
+                const html = `
+                    <div class="modal-overlay" id="emoji-modal-overlay">
+                        <div class="modal">
+                            <h3>😀 Choose an Emoji</h3>
+                            <div class="emoji-grid">${emojis.map(e => `<button class="emoji-opt">${e}</button>`).join('')}</div>
+                            <button class="tb-btn" id="emoji-close" style="margin-top:10px;">Close</button>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+                modalContainer.querySelectorAll('.emoji-opt').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        addEmojiOverlay(btn.textContent);
+                        modalContainer.innerHTML = '';
+                    });
+                });
+                $('#emoji-close').addEventListener('click', () => { modalContainer.innerHTML = ''; });
+                $('#emoji-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) modalContainer.innerHTML = '';
+                });
+            }
+
+            function openStickerPicker() {
+                const stickers = ['⭐','❤️','🎯','💡','🔥','🌈','🎵','🚀','👑','💎','🌟','🎨','📌','🍀','⚡','🎉','💻','📷','🌺','🦄'];
+                const html = `
+                    <div class="modal-overlay" id="sticker-modal-overlay">
+                        <div class="modal">
+                            <h3>⭐ Choose a Sticker</h3>
+                            <div class="sticker-grid">${stickers.map(s => `<button class="sticker-opt">${s}</button>`).join('')}</div>
+                            <button class="tb-btn" id="sticker-close" style="margin-top:10px;">Close</button>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+                modalContainer.querySelectorAll('.sticker-opt').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        addStickerOverlay(btn.textContent);
+                        modalContainer.innerHTML = '';
+                    });
+                });
+                $('#sticker-close').addEventListener('click', () => { modalContainer.innerHTML = ''; });
+                $('#sticker-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) modalContainer.innerHTML = '';
+                });
+            }
+
+            function openExportModal() {
+                if (state.videoSources.length === 0) {
+                    toastMsg('No video to export');
+                    return;
+                }
+                const html = `
+                    <div class="modal-overlay" id="export-modal-overlay">
+                        <div class="modal">
+                            <h3>📤 Export Video</h3>
+                            <p style="margin-bottom:12px;color:var(--text2);">Your video with all edits will be processed.</p>
+                            <label>Format:</label>
+                            <select id="export-format" style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+                                <option value="webm">WEBM</option>
+                                <option value="mp4">MP4</option>
+                            </select>
+                            <label>Quality:</label>
+                            <select id="export-quality" style="width:100%;padding:8px;border-radius:4px;border:1px solid var(--border2);background:var(--surface);color:var(--text);">
+                                <option value="480">480p</option>
+                                <option value="720" selected>720p</option>
+                                <option value="1080">1080p</option>
+                            </select>
+                            <div id="export-progress-bar" style="display:none;margin-top:10px;">
+                                <div style="background:var(--surface2);border-radius:10px;height:20px;overflow:hidden;">
+                                    <div id="export-progress-fill" style="width:0%;height:100%;background:var(--accent);transition:width 0.3s;"></div>
+                                </div>
+                                <span id="export-progress-text" style="font-size:0.8rem;">0%</span>
+                            </div>
+                            <div class="btn-row">
+                                <button class="tb-btn accent" id="export-start">Export</button>
+                                <button class="tb-btn" id="export-cancel">Cancel</button>
+                            </div>
+                            <p style="font-size:0.7rem;color:var(--text2);margin-top:8px;">⚠️ Note: Full video rendering with all effects requires a rendering engine. Export will process the current frame with overlays.</p>
+                        </div>
+                    </div>`;
+                modalContainer.innerHTML = html;
+
+                $('#export-cancel').addEventListener('click', () => {
+                    if (!state.isExporting) modalContainer.innerHTML = '';
+                });
+                $('#export-start').addEventListener('click', startExport);
+                $('#export-modal-overlay').addEventListener('click', function(e) {
+                    if (e.target === this && !state.isExporting) modalContainer.innerHTML = '';
+                });
+            }
+
+            function startExport() {
+                if (state.isExporting) return;
+                if (!MediaRecorder) {
+                    toastMsg('Your browser does not support video export. Please use a modern browser like Chrome or Edge.');
+                    return;
+                }
+                state.isExporting = true;
+                const format = $('#export-format').value;
+                const quality = $('#export-quality').value;
+                const qMap = { '480': { w: 854, h: 480 }, '720': { w: 1280, h: 720 }, '1080': { w: 1920, h: 1080 } };
+                const dims = qMap[quality];
+
+                $('#export-progress-bar').style.display = 'block';
+                $('#export-progress-fill').style.width = '0%';
+                $('#export-progress-text').textContent = 'Preparing...';
+                $('#export-start').disabled = true;
+                $('#export-start').textContent = 'Exporting...';
+
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = dims.w;
+                exportCanvas.height = dims.h;
+                const exportCtx = exportCanvas.getContext('2d');
+
+                const stream = exportCanvas.captureStream(30);
+                let mimeType = 'video/webm;codecs=vp9';
+                if (format === 'mp4' && MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E')) {
+                    mimeType = 'video/mp4;codecs=avc1.42E01E';
+                } else if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'video/webm';
+                }
+
+                const chunks = [];
+                let recorder;
+                try {
+                    recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5000000 });
+                } catch (e) {
+                    try {
+                        recorder = new MediaRecorder(stream, { videoBitsPerSecond: 5000000 });
+                    } catch (e2) {
+                        toastMsg('Export failed: Your browser does not support MediaRecorder.');
+                        state.isExporting = false;
+                        $('#export-start').disabled = false;
+                        $('#export-start').textContent = 'Export';
+                        return;
+                    }
+                }
+
+                recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: mimeType });
+                    const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'edited_video.' + ext;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    state.isExporting = false;
+                    $('#export-progress-text').textContent = 'Done! ✅';
+                    $('#export-start').disabled = false;
+                    $('#export-start').textContent = 'Export';
+                    toastMsg('Export complete! 📤');
+                    setTimeout(() => { if (modalContainer.innerHTML.includes('export-modal-overlay')) modalContainer.innerHTML = ''; }, 1500);
+                };
+
+                recorder.start(100);
+                const origPlaying = state.isPlaying;
+                if (origPlaying) pausePlayback();
+
+                const startTime = state.trimStart;
+                const endTime = state.trimEnd || state.duration;
+                const totalDuration = endTime - startTime;
+                const fps = 30;
+                const totalFrames = Math.max(1, Math.ceil(totalDuration * fps));
+                let frameIndex = 0;
+                videoElement.currentTime = startTime;
+
+                function exportFrame() {
+                    if (frameIndex >= totalFrames || !state.isExporting) {
+                        recorder.stop();
+                        if (origPlaying) startPlayback();
+                        return;
+                    }
+                    const t = startTime + (frameIndex / fps);
+                    videoElement.currentTime = t;
+
+                    const checkSeek = () => {
+                        if (Math.abs(videoElement.currentTime - t) < 0.05 || frameIndex === 0) {
+                            exportCtx.clearRect(0, 0, dims.w, dims.h);
+                            if (videoElement.readyState >= 2) {
+                                exportCtx.drawImage(videoElement, 0, 0, dims.w, dims.h);
+                            }
+                            const sx = dims.w / mainCanvas.width;
+                            const sy = dims.h / mainCanvas.height;
+                            state.overlays.forEach(ovl => {
+                                exportCtx.save();
+                                exportCtx.globalAlpha = ovl.opacity !== undefined ? ovl.opacity : 1;
+                                const cx = ovl.x * sx + ovl.width * sx / 2;
+                                const cy = ovl.y * sy + ovl.height * sy / 2;
+                                exportCtx.translate(cx, cy);
+                                if (ovl.rotation) exportCtx.rotate(ovl.rotation * Math.PI / 180);
+                                exportCtx.translate(-ovl.width * sx / 2, -ovl.height * sy / 2);
+                                if (ovl.type === 'text') {
+                                    exportCtx.font = `${(ovl.fontSize||48)*sy}px "${ovl.font||'Arial'}"`;
+                                    exportCtx.fillStyle = ovl.fontColor || '#fff';
+                                    exportCtx.fillText(ovl.content, 0, 0);
+                                } else {
+                                    exportCtx.font = `${(ovl.height||60)*sy}px "Segoe UI Emoji",sans-serif`;
+                                    exportCtx.fillText(ovl.content, 0, 0);
+                                }
+                                exportCtx.restore();
+                            });
+                            frameIndex++;
+                            const progress = Math.round((frameIndex / totalFrames) * 100);
+                            $('#export-progress-fill').style.width = progress + '%';
+                            $('#export-progress-text').textContent = progress + '%';
+                            setTimeout(exportFrame, 1000 / fps);
+                        } else {
+                            requestAnimationFrame(checkSeek);
+                        }
+                    };
+                    checkSeek();
+                }
+                setTimeout(exportFrame, 200);
+            }
+
+            // ==================== FILTER SYSTEM ====================
+            function updateFilterPanel() {
+                $('#prop-filter').style.display = 'block';
+                $('#filter-label').textContent = state.activeFilter.charAt(0).toUpperCase() + state.activeFilter.slice(1);
+                let val = state.filters[state.activeFilter] !== undefined ? state.filters[state.activeFilter] : 100;
+                if (['blur','vignette','grayscale','invert','sepia','sharpen','glow','warmth'].includes(state.activeFilter)) {
+                    val = state.filters[state.activeFilter] || 0;
+                    $('#filter-value').max = state.activeFilter === 'blur' ? 50 : 100;
+                } else {
+                    $('#filter-value').max = 200;
+                }
+                $('#filter-value').value = val;
+                $('#filter-value-display').textContent = val;
+            }
+
+            function updateFilterPresets() {
+                const presets = [
+                    { name: 'Original', filters: { brightness: 100, contrast: 100, saturation: 100, vibrance: 100, exposure: 100, warmth: 0, blur: 0, vignette: 0, grayscale: 0, invert: 0, sepia: 0, sharpen: 0, glow: 0, hdr: 0 } },
+                    { name: 'Vintage', filters: { brightness: 110, contrast: 85, saturation: 70, vibrance: 80, exposure: 105, warmth: 30, blur: 0, vignette: 20, grayscale: 0, invert: 0, sepia: 40, sharpen: 0, glow: 10, hdr: 0 } },
+                    { name: 'Retro', filters: { brightness: 105, contrast: 90, saturation: 60, vibrance: 70, exposure: 100, warmth: 40, blur: 0, vignette: 15, grayscale: 0, invert: 0, sepia: 60, sharpen: 0, glow: 5, hdr: 0 } },
+                    { name: 'Noir', filters: { brightness: 90, contrast: 130, saturation: 0, vibrance: 0, exposure: 95, warmth: 0, blur: 0, vignette: 30, grayscale: 100, invert: 0, sepia: 0, sharpen: 10, glow: 0, hdr: 0 } },
+                    { name: 'Cool', filters: { brightness: 100, contrast: 100, saturation: 90, vibrance: 90, exposure: 100, warmth: -30, blur: 0, vignette: 0, grayscale: 0, invert: 0, sepia: 0, sharpen: 0, glow: 0, hdr: 0 } },
+                    { name: 'Warm', filters: { brightness: 105, contrast: 95, saturation: 110, vibrance: 105, exposure: 102, warmth: 50, blur: 0, vignette: 5, grayscale: 0, invert: 0, sepia: 20, sharpen: 0, glow: 0, hdr: 0 } },
+                    { name: 'HDR', filters: { brightness: 105, contrast: 120, saturation: 120, vibrance: 115, exposure: 105, warmth: 0, blur: 0, vignette: 0, grayscale: 0, invert: 0, sepia: 0, sharpen: 15, glow: 5, hdr: 30 } },
+                    { name: 'Glow', filters: { brightness: 110, contrast: 95, saturation: 105, vibrance: 100, exposure: 108, warmth: 5, blur: 3, vignette: 0, grayscale: 0, invert: 0, sepia: 0, sharpen: 0, glow: 25, hdr: 0 } },
+                ];
+                const container = $('#filter-presets');
+                container.innerHTML = presets.map(p =>
+                    `<button class="filter-preset-btn" data-preset="${p.name}">${p.name}</button>`
+                ).join('');
+                container.querySelectorAll('.filter-preset-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const preset = presets.find(p => p.name === btn.dataset.preset);
+                        if (preset) {
+                            Object.assign(state.filters, preset.filters);
+                            updateFilterPanel();
+                            renderFrame(state.currentTime);
+                            saveState();
+                            toastMsg('Filter: ' + preset.name);
+                        }
+                    });
+                });
+            }
+
+            function applyFilterValue() {
+                const val = parseFloat($('#filter-value').value);
+                $('#filter-value-display').textContent = val;
+                state.filters[state.activeFilter] = val;
+                renderFrame(state.currentTime);
+                saveState();
+            }
+
+            // ==================== TIMELINE ====================
+            function updateTimelineUI() {
+                const videoTrack = $('#tl-video-track');
+                const audioTrack = $('#tl-audio-track');
+                const textTrack = $('#tl-text-track');
+                const emojiTrack = $('#tl-emoji-track');
+
+                [videoTrack, audioTrack, textTrack, emojiTrack].forEach(track => {
+                    const clips = track.querySelectorAll('.tl-clip');
+                    clips.forEach(c => c.remove());
+                });
+
+                state.videoSources.forEach((src, i) => {
+                    const clip = document.createElement('span');
+                    clip.className = 'tl-clip video-clip';
+                    clip.textContent = '🎬 ' + (src.name.length > 20 ? src.name.substring(0, 18) + '..' : src.name);
+                    clip.title = src.name + ' (click to switch)';
+                    clip.style.cursor = 'pointer';
+                    clip.addEventListener('click', () => {
+                        loadVideoSource(i);
+                        renderFrame(state.currentTime);
+                    });
+                    const rmBtn = document.createElement('span');
+                    rmBtn.className = 'clip-remove';
+                    rmBtn.textContent = '×';
+                    rmBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeVideoSource(i);
+                    });
+                    clip.appendChild(rmBtn);
+                    videoTrack.appendChild(clip);
+                });
+
+                state.audioSources.forEach((src, i) => {
+                    const clip = document.createElement('span');
+                    clip.className = 'tl-clip audio-clip';
+                    clip.textContent = '🎵 ' + (src.name.length > 20 ? src.name.substring(0, 18) + '..' : src.name);
+                    clip.title = src.name;
+                    const rmBtn = document.createElement('span');
+                    rmBtn.className = 'clip-remove';
+                    rmBtn.textContent = '×';
+                    rmBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeAudioSource(i);
+                    });
+                    clip.appendChild(rmBtn);
+                    audioTrack.appendChild(clip);
+                });
+
+                state.overlays.filter(o => o.type === 'text').forEach(ovl => {
+                    const clip = document.createElement('span');
+                    clip.className = 'tl-clip text-clip';
+                    clip.textContent = '🔤 ' + (ovl.content.length > 15 ? ovl.content.substring(0, 13) + '..' : ovl.content);
+                    clip.addEventListener('click', () => {
+                        state.selectedOverlayId = ovl.id;
+                        updatePropertiesPanel(ovl);
+                        renderFrame(state.currentTime);
+                    });
+                    const rmBtn = document.createElement('span');
+                    rmBtn.className = 'clip-remove';
+                    rmBtn.textContent = '×';
+                    rmBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        state.overlays = state.overlays.filter(o => o.id !== ovl.id);
+                        if (state.selectedOverlayId === ovl.id) state.selectedOverlayId = null;
+                        updatePropertiesPanel(null);
+                        updateTimelineUI();
+                        renderFrame(state.currentTime);
+                        saveState();
+                    });
+                    clip.appendChild(rmBtn);
+                    textTrack.appendChild(clip);
+                });
+
+                state.overlays.filter(o => o.type === 'emoji' || o.type === 'sticker').forEach(ovl => {
+                    const clip = document.createElement('span');
+                    clip.className = 'tl-clip emoji-clip';
+                    clip.textContent = ovl.content + ' ' + ovl.type;
+                    clip.addEventListener('click', () => {
+                        state.selectedOverlayId = ovl.id;
+                        updatePropertiesPanel(ovl);
+                        renderFrame(state.currentTime);
+                    });
+                    const rmBtn = document.createElement('span');
+                    rmBtn.className = 'clip-remove';
+                    rmBtn.textContent = '×';
+                    rmBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        state.overlays = state.overlays.filter(o => o.id !== ovl.id);
+                        if (state.selectedOverlayId === ovl.id) state.selectedOverlayId = null;
+                        updatePropertiesPanel(null);
+                        updateTimelineUI();
+                        renderFrame(state.currentTime);
+                        saveState();
+                    });
+                    clip.appendChild(rmBtn);
+                    emojiTrack.appendChild(clip);
+                });
+            }
+
+            function removeVideoSource(index) {
+                if (state.videoSources.length <= 1) {
+                    toastMsg('Cannot remove last video source');
+                    return;
+                }
+                URL.revokeObjectURL(state.videoSources[index].url);
+                state.videoSources.splice(index, 1);
+                if (state.currentVideoIndex >= state.videoSources.length) {
+                    state.currentVideoIndex = state.videoSources.length - 1;
+                }
+                loadVideoSource(state.currentVideoIndex);
+                updateTimelineUI();
+                saveState();
+            }
+
+            function removeAudioSource(index) {
+                URL.revokeObjectURL(state.audioSources[index].url);
+                state.audioSources.splice(index, 1);
+                if (state.audioSources.length === 0) {
+                    musicElement.src = '';
+                    $('#prop-music').style.display = 'none';
+                }
+                updateTimelineUI();
+                saveState();
+            }
+
+            // ==================== SAVE / LOAD PROJECT ====================
+            function saveProjectToFile() {
+                const projectData = {
+                    version: '1.0',
+                    timestamp: Date.now(),
+                    videoSources: state.videoSources.map(s => ({ name: s.name, duration: s.duration })),
+                    audioSources: state.audioSources.map(s => ({ name: s.name })),
+                    currentVideoIndex: state.currentVideoIndex,
+                    overlays: state.overlays,
+                    selectedOverlayId: state.selectedOverlayId,
+                    volume: state.volume,
+                    muted: state.muted,
+                    speed: state.speed,
+                    filters: state.filters,
+                    activeFilter: state.activeFilter,
+                    trimStart: state.trimStart,
+                    trimEnd: state.trimEnd,
+                    cropRegion: state.cropRegion,
+                    flipH: state.flipH,
+                    flipV: state.flipV,
+                    rotation: state.rotation,
+                    musicVolume: state.musicVolume,
+                    musicLoop: state.musicLoop,
+                    transition: state.transition,
+                    canvasWidth: mainCanvas.width,
+                    canvasHeight: mainCanvas.height,
+                };
+
+                const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'project_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                toastMsg('Project saved! 💾 (Note: Video/audio files must be re-imported)');
+            }
+
+            function loadProjectFromFile(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (data.trimStart !== undefined) state.trimStart = data.trimStart;
+                        if (data.trimEnd !== undefined) state.trimEnd = data.trimEnd;
+                        if (data.cropRegion) state.cropRegion = data.cropRegion;
+                        if (data.flipH !== undefined) state.flipH = data.flipH;
+                        if (data.flipV !== undefined) state.flipV = data.flipV;
+                        if (data.rotation !== undefined) state.rotation = data.rotation;
+                        if (data.filters) Object.assign(state.filters, data.filters);
+                        if (data.overlays) state.overlays = data.overlays;
+                        if (data.transition) state.transition = data.transition;
+                        if (data.speed) {
+                            state.speed = data.speed;
+                            speedSelect.value = data.speed;
+                            videoElement.playbackRate = data.speed;
+                        }
+                        if (data.volume !== undefined) {
+                            state.volume = data.volume;
+                            volumeSlider.value = data.volume * 100;
+                        }
+                        if (data.muted !== undefined) {
+                            state.muted = data.muted;
+                            btnMute.textContent = state.muted ? '🔇' : '🔊';
+                        }
+                        if (data.canvasWidth && data.canvasHeight) {
+                            mainCanvas.width = data.canvasWidth;
+                            mainCanvas.height = data.canvasHeight;
+                        }
+                        updateCanvasSize();
+                        updateTimelineUI();
+                        updateFilterPanel();
+                        renderFrame(state.currentTime);
+                        updateTimeDisplay();
+                        saveState();
+                        toastMsg('Project loaded! 📂 (Re-import video/audio files)');
+                    } catch (err) {
+                        console.error('Failed to load project:', err);
+                        toastMsg('Error loading project file');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            }
+
+            // ==================== UNDO / REDO ====================
+            function saveState() {
+                const snapshot = {
+                    videoSources: state.videoSources.map(s => ({ ...s, file: null, url: s.url })),
+                    audioSources: state.audioSources.map(s => ({ ...s, file: null, url: s.url, audioBuffer: null })),
+                    currentVideoIndex: state.currentVideoIndex,
+                    overlays: JSON.parse(JSON.stringify(state.overlays)),
+                    selectedOverlayId: state.selectedOverlayId,
+                    currentTime: state.currentTime,
+                    volume: state.volume,
+                    muted: state.muted,
+                    speed: state.speed,
+                    filters: { ...state.filters },
+                    activeFilter: state.activeFilter,
+                    trimStart: state.trimStart,
+                    trimEnd: state.trimEnd,
+                    cropRegion: state.cropRegion ? { ...state.cropRegion } : null,
+                    flipH: state.flipH,
+                    flipV: state.flipV,
+                    rotation: state.rotation,
+                    musicVolume: state.musicVolume,
+                    musicFadeIn: state.musicFadeIn,
+                    musicFadeOut: state.musicFadeOut,
+                    musicLoop: state.musicLoop,
+                    transition: state.transition,
+                };
+                state.undoStack.push(snapshot);
+                if (state.undoStack.length > 50) state.undoStack.shift();
+                state.redoStack = [];
+            }
+
+            function undo() {
+                if (state.undoStack.length === 0) {
+                    toastMsg('Nothing to undo');
+                    return;
+                }
+                const currentSnap = createSnapshot();
+                state.redoStack.push(currentSnap);
+                const snap = state.undoStack.pop();
+                restoreSnapshot(snap);
+                toastMsg('Undo ↩️');
+            }
+
+            function redo() {
+                if (state.redoStack.length === 0) {
+                    toastMsg('Nothing to redo');
+                    return;
+                }
+                const currentSnap = createSnapshot();
+                state.undoStack.push(currentSnap);
+                const snap = state.redoStack.pop();
+                restoreSnapshot(snap);
+                toastMsg('Redo ↪️');
+            }
+
+            function createSnapshot() {
+                return {
+                    videoSources: state.videoSources.map(s => ({ ...s, file: null, url: s.url })),
+                    audioSources: state.audioSources.map(s => ({ ...s, file: null, url: s.url, audioBuffer: null })),
+                    currentVideoIndex: state.currentVideoIndex,
+                    overlays: JSON.parse(JSON.stringify(state.overlays)),
+                    selectedOverlayId: state.selectedOverlayId,
+                    currentTime: state.currentTime,
+                    volume: state.volume,
+                    muted: state.muted,
+                    speed: state.speed,
+                    filters: { ...state.filters },
+                    activeFilter: state.activeFilter,
+                    trimStart: state.trimStart,
+                    trimEnd: state.trimEnd,
+                    cropRegion: state.cropRegion ? { ...state.cropRegion } : null,
+                    flipH: state.flipH,
+                    flipV: state.flipV,
+                    rotation: state.rotation,
+                    musicVolume: state.musicVolume,
+                    musicFadeIn: state.musicFadeIn,
+                    musicFadeOut: state.musicFadeOut,
+                    musicLoop: state.musicLoop,
+                    transition: state.transition,
+                };
+            }
+
+            function restoreSnapshot(snap) {
+                state.currentVideoIndex = snap.currentVideoIndex;
+                state.overlays = JSON.parse(JSON.stringify(snap.overlays));
+                state.selectedOverlayId = snap.selectedOverlayId;
+                state.volume = snap.volume;
+                state.muted = snap.muted;
+                state.speed = snap.speed;
+                state.filters = { ...snap.filters };
+                state.activeFilter = snap.activeFilter;
+                state.trimStart = snap.trimStart;
+                state.trimEnd = snap.trimEnd;
+                state.cropRegion = snap.cropRegion ? { ...snap.cropRegion } : null;
+                state.flipH = snap.flipH;
+                state.flipV = snap.flipV;
+                state.rotation = snap.rotation;
+                state.musicVolume = snap.musicVolume;
+                state.musicFadeIn = snap.musicFadeIn;
+                state.musicFadeOut = snap.musicFadeOut;
+                state.musicLoop = snap.musicLoop;
+                state.transition = snap.transition;
+                state.currentTime = snap.currentTime;
+
+                videoElement.volume = state.muted ? 0 : state.volume;
+                videoElement.playbackRate = state.speed;
+                volumeSlider.value = state.volume * 100;
+                speedSelect.value = state.speed;
+                btnMute.textContent = state.muted ? '🔇' : '🔊';
+                seekBar.value = state.currentTime * 100;
+                if (state.musicGainNode) state.musicGainNode.gain.value = state.muted ? 0 : state.musicVolume;
+                $('#music-volume').value = state.musicVolume * 100;
+                $('#music-fadein').value = state.musicFadeIn;
+                $('#music-fadeout').value = state.musicFadeOut;
+                $('#music-loop').checked = state.musicLoop;
+
+                updateTimelineUI();
+                updatePropertiesPanel(state.overlays.find(o => o.id === state.selectedOverlayId) || null);
+                updateFilterPanel();
+                renderFrame(state.currentTime);
+                updateTimeDisplay();
+            }
+
+            function resetProject() {
+                if (confirm('Reset entire project? This cannot be undone.')) {
+                    state.videoSources.forEach(s => URL.revokeObjectURL(s.url));
+                    state.audioSources.forEach(s => URL.revokeObjectURL(s.url));
+                    state.videoSources = [];
+                    state.audioSources = [];
+                    state.overlays = [];
+                    state.selectedOverlayId = null;
+                    state.currentVideoIndex = 0;
+                    state.isPlaying = false;
+                    state.isStopped = false;
+                    state.currentTime = 0;
+                    state.duration = 0;
+                    state.trimStart = 0;
+                    state.trimEnd = null;
+                    state.cropRegion = null;
+                    state.flipH = false;
+                    state.flipV = false;
+                    state.rotation = 0;
+                    state.filters = { brightness: 100, contrast: 100, saturation: 100, vibrance: 100, exposure: 100, warmth: 0, blur: 0, vignette: 0, grayscale: 0, invert: 0, sepia: 0, sharpen: 0, glow: 0, hdr: 0 };
+                    state.transition = null;
+                    state.transitionProgress = 0;
+                    state.undoStack = [];
+                    state.redoStack = [];
+                    videoElement.src = '';
+                    musicElement.src = '';
+                    btnPlay.textContent = '▶';
+                    seekBar.value = 0;
+                    updateTimelineUI();
+                    updatePropertiesPanel(null);
+                    $('#prop-music').style.display = 'none';
+                    $('#prop-filter').style.display = 'none';
+                    renderFrame(0);
+                    updateTimeDisplay();
+                    ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+                    if (state.animationFrameId) cancelAnimationFrame(state.animationFrameId);
+                    toastMsg('Project reset 🔄');
+                }
+            }
+
+            // ==================== UTILITIES ====================
+            function toastMsg(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+            }
+
+            // ==================== INITIALIZATION ====================
+            updateCanvasSize();
+            renderFrame(0);
+            updateTimeDisplay();
+            updateFilterPresets();
+            init();
+
+            console.log('✅ Cap Video Editor Studio Maker Creator initialized');
+            console.log('📹 All buttons connected and functional');
+            console.log('🎬 Import video | 🎵 Add audio | 🔤 Add text | 😀 Add emojis');
+            console.log('⌨️ Space=Play/Pause | Arrow keys=Skip | Ctrl+Z=Undo | Ctrl+Y=Redo | Ctrl+S=Save');
+        })();
+    </script>
+</body>
+</html>
