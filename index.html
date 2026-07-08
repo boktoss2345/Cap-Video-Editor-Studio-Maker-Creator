@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Cap Video Editor Studio Maker Creator</title>
     <style>
         :root {
@@ -756,6 +756,92 @@
             display: inline-block;
             margin-right: 4px;
         }
+
+        /* RATE US OVERLAY STYLES */
+        .rate-us-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            animation: fadeInRate 0.6s ease-out;
+            padding: 20px;
+            text-align: center;
+        }
+        .rate-us-overlay.fade-out {
+            animation: fadeOutRate 0.35s ease-in forwards;
+        }
+        @keyframes fadeInRate {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOutRate {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.96); }
+        }
+        .rate-stars {
+            font-size: 3.5rem;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+        .rate-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .rate-message {
+            font-size: 1.3rem;
+            color: #FFFFFF;
+            margin-bottom: 40px;
+            line-height: 1.5;
+            max-width: 320px;
+            font-weight: 400;
+        }
+        .rate-btn-primary {
+            background: #FFFFFF;
+            color: #000000;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 24px rgba(255,255,255,0.25);
+            width: auto;
+            min-width: 220px;
+            font-family: inherit;
+        }
+        .rate-btn-primary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(255,255,255,0.35);
+        }
+        .rate-btn-secondary {
+            background: transparent;
+            color: #9CA3AF;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: color 0.2s;
+            font-weight: 500;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+        }
+        .rate-btn-secondary:hover {
+            color: #D1D5DB;
+        }
     </style>
 </head>
 <body>
@@ -1004,6 +1090,75 @@
             musicElement.crossOrigin = 'anonymous';
             musicElement.preload = 'auto';
 
+            // ==================== RATE US LOGIC ====================
+            function checkAndShowRateUs() {
+                if (localStorage.getItem("rateUsShown")) {
+                    return;
+                }
+                setTimeout(() => {
+                    if (!localStorage.getItem("rateUsShown")) {
+                        showRateUsOverlay();
+                        localStorage.setItem("rateUsShown", "true");
+                    }
+                }, 20000); // 20 seconds delay
+            }
+
+            function showRateUsOverlay() {
+                // Remove existing if any
+                const existing = document.getElementById('rate-us-overlay');
+                if (existing) existing.remove();
+
+                const overlay = document.createElement('div');
+                overlay.id = 'rate-us-overlay';
+                overlay.className = 'rate-us-overlay';
+                overlay.innerHTML = `
+                    <div class="rate-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="rate-title">Rate Us</div>
+                    <div class="rate-message">To Run The App For Free,<br>Rate Good Review</div>
+                    <button class="rate-btn-primary" id="rate-now-btn">RATE NOW</button>
+                    <button class="rate-btn-secondary" id="maybe-later-btn">MAYBE LATER</button>
+                `;
+                document.body.appendChild(overlay);
+
+                const closeOverlay = (fade = true) => {
+                    if (fade) {
+                        overlay.classList.add('fade-out');
+                        setTimeout(() => {
+                            if (overlay.parentNode) overlay.remove();
+                        }, 350);
+                    } else {
+                        overlay.remove();
+                    }
+                };
+
+                document.getElementById('rate-now-btn').addEventListener('click', () => {
+                    const amazonAppUrl = "amzn://apps/android?p=com.videoeditor.capvideoeditor.studiomakercreator";
+                    const amazonWebUrl = "https://www.amazon.com/gp/mas/dl/android?p=com.videoeditor.capvideoeditor.studiomakercreator";
+
+                    let timeoutId;
+                    const fallbackTimer = setTimeout(() => {
+                        window.open(amazonWebUrl, '_blank');
+                    }, 2200);
+
+                    try {
+                        window.location.href = amazonAppUrl;
+                    } catch (e) {
+                        clearTimeout(fallbackTimer);
+                        window.open(amazonWebUrl, '_blank');
+                    }
+
+                    // Close overlay after attempting to open store
+                    setTimeout(() => {
+                        clearTimeout(fallbackTimer);
+                        closeOverlay(true);
+                    }, 800);
+                });
+
+                document.getElementById('maybe-later-btn').addEventListener('click', () => {
+                    closeOverlay(true);
+                });
+            }
+
             // ==================== INITIALIZATION ====================
             function init() {
                 setupEventListeners();
@@ -1012,6 +1167,7 @@
                 updateTimeDisplay();
                 updateCanvasSize();
                 toastMsg('Ready! Import a video to begin. 🎬');
+                checkAndShowRateUs(); // 👈 Start the Rate Us timer
             }
 
             function setupEventListeners() {
