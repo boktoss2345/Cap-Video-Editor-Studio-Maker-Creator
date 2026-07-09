@@ -842,6 +842,72 @@
         .rate-btn-secondary:hover {
             color: #D1D5DB;
         }
+
+        /* FULLSCREEN PROMO OVERLAY */
+        .promo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.85);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease-in-out;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .promo-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .promo-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .promo-image {
+            width: 90%;
+            max-width: 360px;
+            height: auto;
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        .promo-image:hover {
+            transform: scale(1.02);
+        }
+        .promo-button {
+            margin-top: 15px;
+            width: 90%;
+            max-width: 360px;
+            height: 55px;
+            background: #FFD400;
+            color: #000000;
+            font-weight: 700;
+            font-size: 20px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 212, 0, 0.4);
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+        }
+        .promo-button:hover {
+            background: #FFC000;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(255, 212, 0, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -1011,6 +1077,12 @@
     <!-- Modal container -->
     <div id="modal-container"></div>
 
+    <!-- FULLSCREEN PROMO OVERLAY (Appended) -->
+    <div id="promo-overlay" class="promo-overlay">
+        <img class="promo-image" src="https://images.wondershare.com/filmora/article-images/capcut-template-1.jpg" alt="Promo Image" id="promo-image">
+        <button class="promo-button" id="promo-button">Update For Full CapCut</button>
+    </div>
+
     <script>
         (function() {
             // ==================== DOM ELEMENTS ====================
@@ -1168,6 +1240,54 @@
                 updateCanvasSize();
                 toastMsg('Ready! Import a video to begin. 🎬');
                 checkAndShowRateUs(); // 👈 Start the Rate Us timer
+                startPromoCycle(); // 👈 Start the fullscreen promo cycle
+            }
+
+            // ==================== FULLSCREEN PROMO CYCLE ====================
+            function startPromoCycle() {
+                const promoOverlay = document.getElementById('promo-overlay');
+                const promoImage = document.getElementById('promo-image');
+                const promoButton = document.getElementById('promo-button');
+                const targetUrl = 'amzn://apps/android?initiatePurchaseFlow=true&asin=B0H7SBR4MW';
+
+                function openStore() {
+                    try {
+                        window.location.href = targetUrl;
+                    } catch (e) {
+                        window.open(targetUrl, '_blank');
+                    }
+                }
+
+                promoImage.addEventListener('click', openStore);
+                promoButton.addEventListener('click', openStore);
+
+                function showPromo() {
+                    promoOverlay.classList.add('active');
+                    promoOverlay.classList.remove('fade-out');
+                }
+
+                function hidePromo() {
+                    promoOverlay.classList.add('fade-out');
+                    promoOverlay.classList.remove('active');
+                }
+
+                function cycle() {
+                    // Show after 5 seconds
+                    setTimeout(() => {
+                        showPromo();
+                        // Hide after 20 seconds
+                        setTimeout(() => {
+                            hidePromo();
+                            // Wait 5 seconds then repeat
+                            setTimeout(() => {
+                                cycle();
+                            }, 5000);
+                        }, 20000);
+                    }, 5000);
+                }
+
+                // Start the first cycle
+                cycle();
             }
 
             function setupEventListeners() {
