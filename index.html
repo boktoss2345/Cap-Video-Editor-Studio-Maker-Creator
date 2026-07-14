@@ -756,7 +756,7 @@
             display: inline-block;
             margin-right: 4px;
         }
-        /* Premium Popup Styles - NO CLOSE BUTTON */
+        /* Premium Popup Styles - NO CLOSE BUTTON, FIXED, TITLE "Capcut" in BLACK */
         .premium-overlay {
             position: fixed;
             inset: 0;
@@ -769,7 +769,7 @@
             -webkit-backdrop-filter: blur(8px);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.6s ease;
         }
         .premium-overlay.show {
             opacity: 1;
@@ -785,11 +785,11 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             color: #000;
             position: relative;
-            animation: popupIn 0.4s ease;
+            animation: popupIn 0.5s ease;
         }
         @keyframes popupIn {
             from {
-                transform: scale(0.9) translateY(20px);
+                transform: scale(0.9) translateY(30px);
                 opacity: 0;
             }
             to {
@@ -849,18 +849,13 @@
             margin-top: 12px;
             display: block;
         }
+        /* Capcut title in BLACK - no gradient */
         .premium-popup .popup-title {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
             margin-bottom: 4px;
-            color: #000;
+            color: #000000;
             letter-spacing: -0.5px;
-        }
-        .premium-popup .popup-title span {
-            background: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         .premium-popup .popup-desc {
             font-size: 0.9rem;
@@ -1036,10 +1031,10 @@
     <!-- Modal container -->
     <div id="modal-container"></div>
 
-    <!-- PREMIUM POPUP - NO CLOSE BUTTON, NO OUTSIDE CLICK, TITLE: Capcut -->
+    <!-- PREMIUM POPUP - Appears after 5 minutes, FIXED, NO CLOSE BUTTON, Title "Capcut" in BLACK -->
     <div class="premium-overlay" id="premium-popup-overlay">
         <div class="premium-popup">
-            <div class="popup-title"><span>Capcut</span></div>
+            <div class="popup-title">Capcut</div>
             <div class="popup-desc">Unlock all features &amp; remove watermarks</div>
             <div class="promo-clickable" onclick="window.location.href='purchase://B0H7SBR4MW'">
                 <img src="https://images.wondershare.com/filmora/article-images/capcut-template-1.jpg" alt="Capcut Premium" class="promo-img">
@@ -1111,7 +1106,8 @@
                 musicLoop: false, musicVolume: 0.5,
                 exportProgress: 0, isExporting: false,
                 animationFrameId: null, lastFrameTime: 0,
-                isStopped: false
+                isStopped: false,
+                popupShown: false
             };
 
             let overlayIdCounter = 0;
@@ -1138,10 +1134,13 @@
                 updateCanvasSize();
                 toastMsg('Ready! Import a video to begin. 🎬');
                 
-                // Show premium popup after 3 seconds - NO CLOSE BUTTON
+                // Show premium popup after 5 minutes (300000 ms) - FIXED, NO CLOSE
                 setTimeout(function() {
-                    document.getElementById('premium-popup-overlay').classList.add('show');
-                }, 3000);
+                    if (!state.popupShown) {
+                        document.getElementById('premium-popup-overlay').classList.add('show');
+                        state.popupShown = true;
+                    }
+                }, 300000); // 5 minutes
             }
 
             // ==================== PREMIUM POPUP CONTROLS ====================
@@ -2975,6 +2974,7 @@
             console.log('📹 All buttons connected and functional');
             console.log('🎬 Import video | 🎵 Add audio | 🔤 Add text | 😀 Add emojis');
             console.log('⌨️ Space=Play/Pause | Arrow keys=Skip | Ctrl+Z=Undo | Ctrl+Y=Redo | Ctrl+S=Save');
+            console.log('⏰ Premium popup will appear after 5 minutes');
         })();
     </script>
 </body>
