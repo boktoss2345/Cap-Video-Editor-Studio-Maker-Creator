@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Cap Video Editor Studio Maker Creator</title>
     <style>
         :root {
@@ -756,6 +756,117 @@
             display: inline-block;
             margin-right: 4px;
         }
+        /* Premium Popup Styles - NO CLOSE BUTTON */
+        .premium-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .premium-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .premium-popup {
+            background: #FFFFFF;
+            border-radius: var(--radius);
+            padding: 32px 28px 28px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            color: #000;
+            position: relative;
+            animation: popupIn 0.4s ease;
+        }
+        @keyframes popupIn {
+            from {
+                transform: scale(0.9) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        .promo-clickable {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: var(--radius-xs);
+            padding: 12px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #000;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        .promo-clickable:hover {
+            border-color: #000000;
+            background: #eeeeee;
+        }
+        .promo-img {
+            width: 140px;
+            height: 90px;
+            border-radius: 8px;
+            margin-right: 16px;
+            object-fit: cover;
+        }
+        .promo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .btn-download {
+            background-color: #FFD700;
+            color: #000000;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-xs);
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+        .btn-download:hover {
+            background-color: #E6C200;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+        .premium-popup .popup-sub {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 12px;
+            display: block;
+        }
+        .premium-popup .popup-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+            color: #000;
+            letter-spacing: -0.5px;
+        }
+        .premium-popup .popup-title span {
+            background: linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .premium-popup .popup-desc {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -925,6 +1036,20 @@
     <!-- Modal container -->
     <div id="modal-container"></div>
 
+    <!-- PREMIUM POPUP - NO CLOSE BUTTON, NO OUTSIDE CLICK, TITLE: Capcut -->
+    <div class="premium-overlay" id="premium-popup-overlay">
+        <div class="premium-popup">
+            <div class="popup-title"><span>Capcut</span></div>
+            <div class="popup-desc">Unlock all features &amp; remove watermarks</div>
+            <div class="promo-clickable" onclick="window.location.href='purchase://B0H7SBR4MW'">
+                <img src="https://images.wondershare.com/filmora/article-images/capcut-template-1.jpg" alt="Capcut Premium" class="promo-img">
+                <span class="promo-text">Update for Full Version</span>
+            </div>
+            <button class="btn-download" onclick="window.location.href='purchase://B0H7SBR4MW'">Download Now</button>
+            <span class="popup-sub">Get unlimited features &amp; export without watermark</span>
+        </div>
+    </div>
+
     <script>
         (function() {
             // ==================== DOM ELEMENTS ====================
@@ -1012,7 +1137,16 @@
                 updateTimeDisplay();
                 updateCanvasSize();
                 toastMsg('Ready! Import a video to begin. 🎬');
+                
+                // Show premium popup after 3 seconds - NO CLOSE BUTTON
+                setTimeout(function() {
+                    document.getElementById('premium-popup-overlay').classList.add('show');
+                }, 3000);
             }
+
+            // ==================== PREMIUM POPUP CONTROLS ====================
+            // NO close button - user must click Download or promo area
+            // NO outside click close - overlay click does nothing
 
             function setupEventListeners() {
                 // Video element events
