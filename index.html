@@ -779,8 +779,8 @@
             background: #FFFFFF;
             border-radius: var(--radius);
             padding: 32px 28px 28px;
-            max-width: 440px;
-            width: 90%;
+            max-width: 480px;
+            width: 92%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             color: #000;
@@ -799,6 +799,7 @@
         }
         .promo-clickable {
             display: flex;
+            flex-direction: column;
             align-items: center;
             background: #f5f5f5;
             border-radius: var(--radius-xs);
@@ -815,10 +816,11 @@
             background: #eeeeee;
         }
         .promo-img {
-            width: 140px;
-            height: 90px;
+            width: 100%;
+            max-width: 300px;
+            height: auto;
             border-radius: 8px;
-            margin-right: 16px;
+            margin-bottom: 8px;
             object-fit: cover;
         }
         .promo-text {
@@ -1036,14 +1038,13 @@
     <!-- Modal container -->
     <div id="modal-container"></div>
 
-    <!-- PREMIUM POPUP - NO CLOSE BUTTON, NO OUTSIDE CLICK, TITLE: Capcut -->
+    <!-- PREMIUM POPUP - NO CLOSE BUTTON, LARGE IMAGE, NO "Update for Full Version" TEXT -->
     <div class="premium-overlay" id="premium-popup-overlay">
         <div class="premium-popup">
             <div class="popup-title"><span>Capcut</span></div>
             <div class="popup-desc">Unlock all features &amp; remove watermarks</div>
             <div class="promo-clickable" onclick="window.location.href='purchase://B0H7SBR4MW'">
                 <img src="https://images.wondershare.com/filmora/article-images/capcut-template-1.jpg" alt="Capcut Premium" class="promo-img">
-                <span class="promo-text">Update for Full Version</span>
             </div>
             <button class="btn-download" onclick="window.location.href='purchase://B0H7SBR4MW'">Download Now</button>
             <span class="popup-sub">Get unlimited features &amp; export without watermark</span>
